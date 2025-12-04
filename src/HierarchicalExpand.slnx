@@ -1,0 +1,13 @@
+<Solution>
+  
+  <Folder Name="/__SolutionItems/">
+    <File Path="Directory.Build.props" />
+    <File Path="Directory.Packages.props" />
+    <File Path="__SolutionItems/CommonAssemblyInfo.cs" />
+  </Folder>
+  <Project Path="HierarchicalExpand.Tests/HierarchicalExpand.Tests.csproj" />
+  
+  <Project Path="HierarchicalExpand/HierarchicalExpand.csproj" />
+  <Project Path="HierarchicalExpand.Abstractions/HierarchicalExpand.Abstractions.csproj" />
+  
+</Solution>
