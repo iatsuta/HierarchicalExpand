@@ -27,6 +27,7 @@ public class HierarchicalExpandSettings : IHierarchicalExpandSettings
 	{
 		this.actions.Add(services =>
 		{
+			services.AddSingleton<HierarchicalInfo>(hierarchicalInfo);
 			services.AddSingleton(hierarchicalInfo);
 
 			services.AddSingleton<FullAncestorLinkInfo>(fullAncestorLinkInfo);
