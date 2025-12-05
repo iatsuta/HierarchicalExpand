@@ -64,7 +64,7 @@ public class HierarchicalObjectAncestorLinkExpander<TDomainObject, TDirectedAnce
         var containsExpr = ExpressionEvaluateHelper.InlineEvaluate(ee =>
             ExpressionHelper.Create((TAncestorLink ancestorLink) => idents.Contains(ee.Evaluate(fromPathIdExpr, ancestorLink))));
 
-        return ancestorLinkQueryable.Where(containsExpr).Select(toPathIdExpr);
+        return ancestorLinkQueryable.Where(containsExpr).Select(toPathIdExpr).Distinct();
     }
 
     public IQueryable<TIdent> ExpandQueryable(IQueryable<TIdent> idents, HierarchicalExpandType expandType)
@@ -98,7 +98,7 @@ public class HierarchicalObjectAncestorLinkExpander<TDomainObject, TDirectedAnce
             ExpressionHelper.Create((TAncestorLink ancestorLink) =>
                 idents.Contains(ee.Evaluate(fromPathIdExpr, ancestorLink))));
 
-        return ancestorLinkQueryable.Where(containsExpr).Select(toPathIdExpr);
+        return ancestorLinkQueryable.Where(containsExpr).Select(toPathIdExpr).Distinct();
     }
 
     public Expression<Func<IEnumerable<TIdent>, IEnumerable<TIdent>>> GetExpandExpression(
@@ -134,7 +134,8 @@ public class HierarchicalObjectAncestorLinkExpander<TDomainObject, TDirectedAnce
             ExpressionHelper.Create<IEnumerable<TIdent>, IEnumerable<TIdent>>(idents =>
 
                 ancestorLinkQueryable.Where(ancestorLink => idents.Contains(ee.Evaluate(fromPathIdExpr, ancestorLink)))
-                    .Select(toPathIdExpr)));
+                    .Select(toPathIdExpr)
+                    .Distinct()));
     }
 
     public Expression<Func<TIdent, IEnumerable<TIdent>>>? TryGetSingleExpandExpression(
@@ -174,7 +175,8 @@ public class HierarchicalObjectAncestorLinkExpander<TDomainObject, TDirectedAnce
 
                 ancestorLinkQueryable
                     .Where(ancestorLink => ee.Evaluate(eqIdentsExpr, ident, ee.Evaluate(fromPathIdExpr, ancestorLink)))
-                    .Select(toPathIdExpr)));
+                    .Select(toPathIdExpr)
+                    .Distinct()));
     }
 
     public Dictionary<TIdent, TIdent> ExpandWithParents(IEnumerable<TIdent> idents, HierarchicalExpandType expandType)
