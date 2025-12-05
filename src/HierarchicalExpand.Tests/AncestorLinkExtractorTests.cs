@@ -1,6 +1,7 @@
 ﻿using CommonFramework.GenericRepository;
 
 using HierarchicalExpand.AncestorDenormalization;
+using HierarchicalExpand.Tests.Domain;
 
 namespace HierarchicalExpand.Tests;
 
@@ -11,7 +12,7 @@ public class AncestorLinkExtractorTests
 	public async Task MoveNode_UpdatesLinksCorrectly(MoveTestCase testCase)
 	{
 		// Arrange
-		var ct = CancellationToken.None;
+		var ct = TestContext.Current.CancellationToken;
 		var queryableSource = Substitute.For<IQueryableSource>();
 
 		queryableSource.GetQueryable<DomainObject>().Returns(testCase.Nodes.AsQueryable());
@@ -40,37 +41,6 @@ public class AncestorLinkExtractorTests
 
 		orderedResult.Should().Be(testCase.ExpectedResult);
 	}
-	public class DomainObject
-    {
-        public required string Name { get; init; }
-
-        public DomainObject? Parent { get; set; }
-
-        public override string ToString() => this.Name;
-    }
-
-    public record DirectAncestorLink
-    {
-        public required DomainObject From { get; init; }
-
-        public required DomainObject To { get; init; }
-
-        public override string ToString()
-        {
-            return $"{nameof(this.From)}:{this.From}|{nameof(this.To)}:{this.To}";
-        }
-	}
-    public record UnDirectAncestorLink
-    {
-	    public required DomainObject From { get; init; }
-
-	    public required DomainObject To { get; init; }
-
-	    public override string ToString()
-	    {
-		    return $"{nameof(this.From)}:{this.From}|{nameof(this.To)}:{this.To}";
-	    }
-    }
 
     public record MoveTestCase(
         IReadOnlyList<DomainObject> Nodes,

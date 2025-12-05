@@ -1,10 +1,11 @@
 ﻿using CommonFramework.GenericRepository;
 
+using HierarchicalExpand.Tests.Domain;
+
 namespace HierarchicalExpand.Tests;
 
 public class DomainObjectExpanderTests
 {
-
 	[Theory]
 	[MemberData(nameof(GetTraversalCases))]
 	public async Task HierarchyTraversal_ShouldReturnExpected(
@@ -14,7 +15,7 @@ public class DomainObjectExpanderTests
 		int expectedQueryCount)
 	{
 		// Arrange
-		var ct = CancellationToken.None;
+		var ct = TestContext.Current.CancellationToken;
 
 		var queryableSource = Substitute.For<IQueryableSource>();
 		queryableSource.GetQueryable<DomainObject>().Returns(_ => AllNodes.AsQueryable());
@@ -32,15 +33,6 @@ public class DomainObjectExpanderTests
 		result.OrderBy(v => v.Name).Should().BeEquivalentTo(expectedResult.OrderBy(v => v.Name));
 		queryableSource.Received(expectedQueryCount).GetQueryable<DomainObject>();
 	}
-
-	public class DomainObject
-    {
-        public required string Name { get; init; }
-
-        public DomainObject? Parent { get; init; }
-
-        public override string ToString() => this.Name;
-    }
 
     /*
         Tree (depth = 6, branched):
