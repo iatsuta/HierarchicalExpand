@@ -54,6 +54,6 @@ public class HierarchicalExpandSettings : IHierarchicalExpandSettings
 
 	private bool AlreadyInitialized(IServiceCollection services)
 	{
-		return services.Any(sd => !sd.IsKeyedService && sd.ServiceType == typeof(IHierarchicalInfoSource));
+		return services.Any(sd => !sd.IsKeyedService && sd.Lifetime == ServiceLifetime.Singleton && sd.ServiceType == typeof(IHierarchicalInfoSource));
 	}
 }
