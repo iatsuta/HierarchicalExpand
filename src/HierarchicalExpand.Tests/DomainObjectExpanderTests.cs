@@ -4,7 +4,36 @@ namespace HierarchicalExpand.Tests;
 
 public class DomainObjectExpanderTests
 {
-    public class DomainObject
+
+	[Theory]
+	[MemberData(nameof(GetTraversalCases))]
+	public async Task HierarchyTraversal_ShouldReturnExpected(
+		IEnumerable<DomainObject> startNodes,
+		IEnumerable<DomainObject> expectedResult,
+		bool expandUp,
+		int expectedQueryCount)
+	{
+		// Arrange
+		var ct = CancellationToken.None;
+
+		var queryableSource = Substitute.For<IQueryableSource>();
+		queryableSource.GetQueryable<DomainObject>().Returns(_ => AllNodes.AsQueryable());
+
+		var expander = new DomainObjectExpander<DomainObject>(
+			new HierarchicalInfo<DomainObject>(x => x.Parent),
+			queryableSource);
+
+		// Act
+		var result = expandUp
+			? await expander.GetAllParents(startNodes, ct)
+			: await expander.GetAllChildren(startNodes, ct);
+
+		// Assert
+		result.OrderBy(v => v.Name).Should().BeEquivalentTo(expectedResult.OrderBy(v => v.Name));
+		queryableSource.Received(expectedQueryCount).GetQueryable<DomainObject>();
+	}
+
+	public class DomainObject
     {
         public required string Name { get; init; }
 
@@ -138,33 +167,5 @@ public class DomainObjectExpanderTests
             false,
             3
         ];
-    }
-
-    [Theory]
-    [MemberData(nameof(GetTraversalCases))]
-    public async Task HierarchyTraversal_ShouldReturnExpected(
-        IEnumerable<DomainObject> startNodes,
-        IEnumerable<DomainObject> expectedResult,
-        bool expandUp,
-        int expectedQueryCount)
-    {
-        // Arrange
-        var ct = CancellationToken.None;
-
-        var queryableSource = Substitute.For<IQueryableSource>();
-        queryableSource.GetQueryable<DomainObject>().Returns(_ => AllNodes.AsQueryable());
-
-        var expander = new DomainObjectExpander<DomainObject>(
-            new HierarchicalInfo<DomainObject>(x => x.Parent),
-            queryableSource);
-
-        // Act
-        var result = expandUp
-            ? await expander.GetAllParents(startNodes, ct)
-            : await expander.GetAllChildren(startNodes, ct);
-
-        // Assert
-        result.OrderBy(v => v.Name).Should().BeEquivalentTo(expectedResult.OrderBy(v => v.Name));
-        queryableSource.Received(expectedQueryCount).GetQueryable<DomainObject>();
     }
 }

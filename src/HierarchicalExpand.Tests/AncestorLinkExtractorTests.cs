@@ -6,7 +6,41 @@ namespace HierarchicalExpand.Tests;
 
 public class AncestorLinkExtractorTests
 {
-    public class DomainObject
+	[Theory]
+	[MemberData(nameof(GetMoveCases))]
+	public async Task MoveNode_UpdatesLinksCorrectly(MoveTestCase testCase)
+	{
+		// Arrange
+		var ct = CancellationToken.None;
+		var queryableSource = Substitute.For<IQueryableSource>();
+
+		queryableSource.GetQueryable<DomainObject>().Returns(testCase.Nodes.AsQueryable());
+		queryableSource.GetQueryable<DirectAncestorLink>().Returns(testCase.ExistingOldLinks.AsQueryable());
+
+		var extractor = new AncestorLinkExtractor<DomainObject, DirectAncestorLink>(
+			queryableSource,
+			new DomainObjectExpander<DomainObject>(new HierarchicalInfo<DomainObject>(v => v.Parent), queryableSource),
+			new FullAncestorLinkInfo<DomainObject, DirectAncestorLink, UnDirectAncestorLink>(
+				new AncestorLinkInfo<DomainObject, DirectAncestorLink>(l => l.From, l => l.To),
+				new AncestorLinkInfo<DomainObject, UnDirectAncestorLink>(l => l.From, l => l.To)));
+
+		// Act
+		foreach (var pair in testCase.UpdateParents)
+		{
+			pair.Key.Parent = pair.Value;
+		}
+
+		var result = await extractor.GetSyncResult(testCase.UpdateParents.Keys, [], ct);
+
+		// Assert
+		var orderedResult =
+			new SyncResult<DomainObject, DirectAncestorLink>(
+				result.Adding.OrderBy(link => link.Ancestor.Name).ThenBy(link => link.Child.Name),
+				result.Removing.OrderBy(link => link.From.Name).ThenBy(link => link.To.Name));
+
+		orderedResult.Should().Be(testCase.ExpectedResult);
+	}
+	public class DomainObject
     {
         public required string Name { get; init; }
 
@@ -36,42 +70,6 @@ public class AncestorLinkExtractorTests
 	    {
 		    return $"{nameof(this.From)}:{this.From}|{nameof(this.To)}:{this.To}";
 	    }
-    }
-
-
-	[Theory]
-    [MemberData(nameof(GetMoveCases))]
-    public async Task MoveNode_UpdatesLinksCorrectly(MoveTestCase testCase)
-    {
-        // Arrange
-        var queryableSource = Substitute.For<IQueryableSource>();
-        var ct = CancellationToken.None;
-
-        queryableSource.GetQueryable<DomainObject>().Returns(testCase.Nodes.AsQueryable());
-        queryableSource.GetQueryable<DirectAncestorLink>().Returns(testCase.ExistingOldLinks.AsQueryable());
-
-        var extractor = new AncestorLinkExtractor<DomainObject, DirectAncestorLink>(
-            queryableSource,
-            new DomainObjectExpander<DomainObject>(new HierarchicalInfo<DomainObject>(v => v.Parent), queryableSource),
-            new FullAncestorLinkInfo<DomainObject, DirectAncestorLink, UnDirectAncestorLink>(
-                new AncestorLinkInfo<DomainObject, DirectAncestorLink>(l => l.From, l => l.To),
-                new AncestorLinkInfo<DomainObject, UnDirectAncestorLink>(l => l.From, l => l.To)));
-
-        // Act
-        foreach (var pair in testCase.UpdateParents)
-        {
-            pair.Key.Parent = pair.Value;
-        }
-
-        var result = await extractor.GetSyncResult(testCase.UpdateParents.Keys, [], ct);
-
-        // Assert
-        var orderedResult =
-            new SyncResult<DomainObject, DirectAncestorLink>(
-                result.Adding.OrderBy(link => link.Ancestor.Name).ThenBy(link => link.Child.Name),
-                result.Removing.OrderBy(link => link.From.Name).ThenBy(link => link.To.Name));
-
-        orderedResult.Should().Be(testCase.ExpectedResult);
     }
 
     public record MoveTestCase(
@@ -155,8 +153,8 @@ public class AncestorLinkExtractorTests
             new() { From = a1, To = c2 },
             new() { From = b1, To = b1 },
             new() { From = b1, To = c1 },
-            new() { From = c1, To = c1 },
             new() { From = b1, To = c2 },
+			new() { From = c1, To = c1 },
             new() { From = c2, To = c2 },
         };
 
