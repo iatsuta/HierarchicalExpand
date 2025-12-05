@@ -3,10 +3,10 @@
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
   </PropertyGroup>
   <ItemGroup>
-    <PackageVersion Include="IvAt.CommonFramework" Version="1.6.1" />
-    <PackageVersion Include="IvAt.CommonFramework.GenericRepository" Version="1.6.1" />
-    <PackageVersion Include="IvAt.CommonFramework.IdentitySource" Version="1.6.1" />
-    <PackageVersion Include="IvAt.GenericQueryable" Version="1.6.1" />
+    <PackageVersion Include="IvAt.CommonFramework" Version="1.6.2" />
+    <PackageVersion Include="IvAt.CommonFramework.GenericRepository" Version="1.6.2" />
+    <PackageVersion Include="IvAt.CommonFramework.IdentitySource" Version="1.6.2" />
+    <PackageVersion Include="IvAt.GenericQueryable" Version="1.6.2" />
   </ItemGroup>
   <!-- Tests -->
   <ItemGroup>
