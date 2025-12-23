@@ -5,6 +5,7 @@
     <File Path="Directory.Packages.props" />
     <File Path="__SolutionItems/CommonAssemblyInfo.cs" />
   </Folder>
+  <Project Path="HierarchicalExpand.IntegrationTests/HierarchicalExpand.IntegrationTests.csproj" />
   <Project Path="HierarchicalExpand.Tests/HierarchicalExpand.Tests.csproj" />
   
   <Project Path="HierarchicalExpand/HierarchicalExpand.csproj" />
