@@ -67,10 +67,13 @@ public class MainTests : TestBase
         var hierarchicalObjectExpanderFactory = scope.ServiceProvider.GetRequiredService<IHierarchicalObjectExpanderFactory>();
         var hierarchicalObjectExpander = hierarchicalObjectExpanderFactory.Create<Guid>(typeof(BusinessUnit));
 
-        var middleBuId = await queryableSource.GetQueryable<BusinessUnit>().Where(bu => bu.Parent!.Parent == null).Select(bu => bu.Id)
+        var middleBuId = await queryableSource.GetQueryable<BusinessUnit>().Where(bu => bu.Parent != null && bu.Parent.Parent == null).Select(bu => bu.Id)
             .GenericFirstAsync(cancellationToken);
 
-        var expectedBuIdents = await queryableSource.GetQueryable<BusinessUnit>().Select(bu => bu.Id).OrderBy(v => v).GenericToListAsync(cancellationToken);
+        var parentsIdents = hierarchicalObjectExpander.Expand([middleBuId], HierarchicalExpandType.Parents).ToList();
+        var childrenIdents = hierarchicalObjectExpander.Expand([middleBuId], HierarchicalExpandType.Children).ToList();
+
+        var expectedBuIdents = parentsIdents.Concat(childrenIdents).Distinct().OrderBy(v => v).ToList();
 
         // Act
         var result = hierarchicalObjectExpander.Expand([middleBuId], HierarchicalExpandType.All).ToList();
