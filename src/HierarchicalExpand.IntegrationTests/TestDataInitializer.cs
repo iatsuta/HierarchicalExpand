@@ -14,16 +14,9 @@ public class TestDataInitializer(TestDbContext dbContext, IDenormalizedAncestors
         await dbContext.EnsureViewsCreatedAsync(cancellationToken);
         await dbContext.SaveChangesAsync(cancellationToken);
 
-        var testRootBu = new BusinessUnit { Name = "TestRootBu" };
-        dbContext.Add(testRootBu);
-
-        foreach (var index in Enumerable.Range(1, 2))
+        foreach (var bu in GetTestBusinessUnits())
         {
-            var testBu = new BusinessUnit { Name = $"Test{nameof(BusinessUnit)}{index}", Parent = testRootBu };
-            dbContext.Add(testBu);
-
-            var testChildBu = new BusinessUnit { Name = $"Test{nameof(BusinessUnit)}{index}-Child", Parent = testBu };
-            dbContext.Add(testChildBu);
+            dbContext.Add(bu);
         }
 
         await dbContext.SaveChangesAsync(cancellationToken);
@@ -31,5 +24,20 @@ public class TestDataInitializer(TestDbContext dbContext, IDenormalizedAncestors
         await denormalizedAncestorsService.SyncAllAsync(cancellationToken);
 
         await dbContext.SaveChangesAsync(cancellationToken);
+    }
+
+    private static IEnumerable<BusinessUnit> GetTestBusinessUnits()
+    {
+        var rootBu = new BusinessUnit { Name = "TestRootBu" };
+        yield return rootBu;
+
+        foreach (var index in Enumerable.Range(1, 2))
+        {
+            var middleBu = new BusinessUnit { Name = $"Test{nameof(BusinessUnit)}{index}", Parent = rootBu };
+            yield return middleBu;
+
+            var leafBu = new BusinessUnit { Name = $"Test{nameof(BusinessUnit)}{index}-Child", Parent = middleBu };
+            yield return leafBu;
+        }
     }
 }
