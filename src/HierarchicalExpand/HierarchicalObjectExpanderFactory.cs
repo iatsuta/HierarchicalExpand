@@ -1,20 +1,22 @@
-﻿using CommonFramework.DictionaryCache;
+﻿using CommonFramework.DependencyInjection;
+using CommonFramework.DictionaryCache;
 using CommonFramework.IdentitySource;
-
-using Microsoft.Extensions.DependencyInjection;
 
 namespace HierarchicalExpand;
 
 public class HierarchicalObjectExpanderFactory : IHierarchicalObjectExpanderFactory
 {
     private readonly IServiceProvider serviceProvider;
+    private readonly IServiceProxyFactory serviceProxyFactory;
     private readonly IIdentityInfoSource identityInfoSource;
     private readonly IRealTypeResolver realTypeResolver;
     private readonly IDictionaryCache<Type, IHierarchicalObjectExpander> cache;
 
-    public HierarchicalObjectExpanderFactory(IServiceProvider serviceProvider, IIdentityInfoSource identityInfoSource, IRealTypeResolver realTypeResolver)
+    public HierarchicalObjectExpanderFactory(IServiceProvider serviceProvider, IServiceProxyFactory serviceProxyFactory, IIdentityInfoSource identityInfoSource,
+        IRealTypeResolver realTypeResolver)
     {
         this.serviceProvider = serviceProvider;
+        this.serviceProxyFactory = serviceProxyFactory;
         this.identityInfoSource = identityInfoSource;
         this.realTypeResolver = realTypeResolver;
 
@@ -35,20 +37,14 @@ public class HierarchicalObjectExpanderFactory : IHierarchicalObjectExpanderFact
 
             var identityInfo = identityInfoSource.GetIdentityInfo(domainType);
 
-            if (fullAncestorLinkInfo != null)
-            {
-                var expanderType = typeof(HierarchicalObjectAncestorLinkExpander<,,,>)
-                    .MakeGenericType(domainType, fullAncestorLinkInfo.DirectedLinkType, fullAncestorLinkInfo.UndirectedLinkType, identityInfo.IdentityType);
+            var (serviceType, args) = fullAncestorLinkInfo != null
+                ? (typeof(HierarchicalObjectAncestorLinkExpander<,,,>)
+                        .MakeGenericType(domainType, fullAncestorLinkInfo.DirectedLinkType, fullAncestorLinkInfo.UndirectedLinkType, identityInfo.IdentityType),
+                    [fullAncestorLinkInfo, identityInfo])
 
-                return (IHierarchicalObjectExpander)ActivatorUtilities.CreateInstance(serviceProvider, expanderType, fullAncestorLinkInfo, identityInfo);
+                : (typeof(PlainHierarchicalObjectExpander<>).MakeGenericType(identityInfo.IdentityType), Array.Empty<object>());
 
-            }
-            else
-            {
-                var expanderType = typeof(PlainHierarchicalObjectExpander<>).MakeGenericType(identityInfo.IdentityType);
-
-                return (IHierarchicalObjectExpander)ActivatorUtilities.CreateInstance(serviceProvider, expanderType);
-            }
+            return serviceProxyFactory.Create<IHierarchicalObjectExpander>(serviceType, args);
         }
     }
 

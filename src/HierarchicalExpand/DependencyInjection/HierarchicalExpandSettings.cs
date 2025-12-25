@@ -1,4 +1,6 @@
-﻿using HierarchicalExpand.AncestorDenormalization;
+﻿using CommonFramework.DependencyInjection;
+
+using HierarchicalExpand.AncestorDenormalization;
 
 using Microsoft.Extensions.DependencyInjection;
 
@@ -45,6 +47,8 @@ public class HierarchicalExpandSettings : IHierarchicalExpandSettings
 	private IServiceCollection RegisterGeneralServices(IServiceCollection services)
 	{
 		return services
+            .TryAddServiceProxyFactory()
+
 			.AddScoped(typeof(IDenormalizedAncestorsService<>), typeof(DenormalizedAncestorsService<>))
 			.AddScoped(typeof(IAncestorLinkExtractor<,>), typeof(AncestorLinkExtractor<,>))
 			.AddSingleton<IRealTypeResolver, IdentityRealTypeResolver>()
