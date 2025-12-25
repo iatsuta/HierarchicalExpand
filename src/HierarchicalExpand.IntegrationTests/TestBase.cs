@@ -7,8 +7,6 @@ using HierarchicalExpand.IntegrationTests.Services;
 using Microsoft.EntityFrameworkCore;
 
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-using static Microsoft.ApplicationInsights.MetricDimensionNames.TelemetryContext;
 
 namespace HierarchicalExpand.IntegrationTests;
 

@@ -1,14 +1,13 @@
-﻿using CommonFramework.GenericRepository;
-
-using Microsoft.Extensions.DependencyInjection;
+﻿using CommonFramework.DependencyInjection;
+using CommonFramework.GenericRepository;
 
 namespace HierarchicalExpand.AncestorDenormalization;
 
-public class DenormalizedAncestorsService<TDomainObject>(IServiceProvider serviceProvider, FullAncestorLinkInfo<TDomainObject> fullAncestorLinkInfo) : IDenormalizedAncestorsService<TDomainObject>
+public class DenormalizedAncestorsService<TDomainObject>(IServiceProxyFactory serviceProxyFactory, FullAncestorLinkInfo<TDomainObject> fullAncestorLinkInfo) : IDenormalizedAncestorsService<TDomainObject>
 {
-	private readonly IDenormalizedAncestorsService<TDomainObject> innerService =
-		(IDenormalizedAncestorsService<TDomainObject>)ActivatorUtilities.CreateInstance(serviceProvider,
-			typeof(DenormalizedAncestorsService<,>).MakeGenericType(typeof(TDomainObject), fullAncestorLinkInfo.DirectedLinkType));
+    private readonly IDenormalizedAncestorsService<TDomainObject> innerService =
+        serviceProxyFactory.Create<IDenormalizedAncestorsService<TDomainObject>>(
+            typeof(DenormalizedAncestorsService<,>).MakeGenericType(typeof(TDomainObject), fullAncestorLinkInfo.DirectedLinkType));
 
 	public Task SyncUpAsync(TDomainObject domainObject, CancellationToken cancellationToken) =>
 		this.innerService.SyncUpAsync(domainObject, cancellationToken);
