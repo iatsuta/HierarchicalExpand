@@ -26,20 +26,20 @@ public class HierarchicalExpandSettings : IHierarchicalExpandSettings
 	public IHierarchicalExpandSettings AddHierarchicalInfo<TDomainObject>(
 		HierarchicalInfo<TDomainObject> hierarchicalInfo,
 		FullAncestorLinkInfo<TDomainObject> fullAncestorLinkInfo)
-	{
-		this.actions.Add(services =>
-		{
-			services.AddSingleton<HierarchicalInfo>(hierarchicalInfo);
-			services.AddSingleton(hierarchicalInfo);
+    {
+        this.actions.Add(services =>
+        {
+            services.AddSingleton<HierarchicalInfo>(hierarchicalInfo);
+            services.AddSingleton(hierarchicalInfo);
 
-			services.AddSingleton<FullAncestorLinkInfo>(fullAncestorLinkInfo);
-			services.AddSingleton(fullAncestorLinkInfo);
+            services.AddSingleton<FullAncestorLinkInfo>(fullAncestorLinkInfo);
+            services.AddSingleton(fullAncestorLinkInfo);
 
-			var directLinkType =
-				typeof(FullAncestorLinkInfo<,>).MakeGenericType(fullAncestorLinkInfo.DomainObjectType, fullAncestorLinkInfo.DirectedLinkType);
+            var directLinkType =
+                typeof(FullAncestorLinkInfo<,>).MakeGenericType(fullAncestorLinkInfo.DomainObjectType, fullAncestorLinkInfo.DirectedLinkType);
 
-			services.Add(ServiceDescriptor.Singleton(directLinkType, fullAncestorLinkInfo));
-		});
+            services.AddSingleton(directLinkType, fullAncestorLinkInfo);
+        });
 
 		return this;
 	}
@@ -47,8 +47,7 @@ public class HierarchicalExpandSettings : IHierarchicalExpandSettings
 	private IServiceCollection RegisterGeneralServices(IServiceCollection services)
 	{
 		return services
-            .TryAddServiceProxyFactory()
-
+            .AddServiceProxyFactory()
 			.AddScoped(typeof(IDenormalizedAncestorsService<>), typeof(DenormalizedAncestorsService<>))
 			.AddScoped(typeof(IAncestorLinkExtractor<,>), typeof(AncestorLinkExtractor<,>))
 			.AddSingleton<IRealTypeResolver, IdentityRealTypeResolver>()
