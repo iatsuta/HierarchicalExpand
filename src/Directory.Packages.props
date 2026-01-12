@@ -3,11 +3,11 @@
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
   </PropertyGroup>
   <ItemGroup>
-    <PackageVersion Include="IvAt.CommonFramework" Version="2.0.3" />
-    <PackageVersion Include="IvAt.CommonFramework.GenericRepository" Version="2.0.3" />
-    <PackageVersion Include="IvAt.CommonFramework.IdentitySource" Version="2.0.3" />
-    <PackageVersion Include="IvAt.GenericQueryable" Version="2.0.3" />
-    <PackageVersion Include="IvAt.GenericQueryable.EntityFramework" Version="2.0.3" />
+    <PackageVersion Include="IvAt.CommonFramework" Version="2.0.4" />
+    <PackageVersion Include="IvAt.CommonFramework.GenericRepository" Version="2.0.4" />
+    <PackageVersion Include="IvAt.CommonFramework.IdentitySource" Version="2.0.4" />
+    <PackageVersion Include="IvAt.GenericQueryable" Version="2.0.4" />
+    <PackageVersion Include="IvAt.GenericQueryable.EntityFramework" Version="2.0.4" />
     <PackageVersion Include="Microsoft.Extensions.DependencyInjection" Version="10.0.1" />
     <PackageVersion Include="Microsoft.EntityFrameworkCore" Version="9.0.6" />
     <PackageVersion Include="Microsoft.EntityFrameworkCore.Proxies" Version="10.0.1" />
