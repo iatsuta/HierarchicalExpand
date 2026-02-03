@@ -5,13 +5,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="IvAt.CommonFramework.GenericRepository" />
     <PackageReference Include="IvAt.CommonFramework.IdentitySource" />
-    <PackageReference Include="IvAt.GenericQueryable" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\HierarchicalExpand.Abstractions\HierarchicalExpand.Abstractions.csproj" />
+    <ProjectReference Include="..\HierarchicalExpand.Runtime\HierarchicalExpand.Runtime.csproj" />
   </ItemGroup>
 
 </Project>

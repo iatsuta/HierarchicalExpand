@@ -1,0 +1,19 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <PackageId>IvAt.HierarchicalExpand.Runtime</PackageId>
+    <RootNamespace>HierarchicalExpand</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\HierarchicalExpand.Abstractions\HierarchicalExpand.Abstractions.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="IvAt.CommonFramework.GenericRepository" />
+    <PackageReference Include="IvAt.CommonFramework.IdentitySource.Abstractions" />
+    <PackageReference Include="IvAt.GenericQueryable.Abstractions" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" />
+  </ItemGroup>
+
+</Project>
