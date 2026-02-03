@@ -6,6 +6,7 @@
     <File Path="__SolutionItems/CommonAssemblyInfo.cs" />
   </Folder>
   <Project Path="HierarchicalExpand.IntegrationTests/HierarchicalExpand.IntegrationTests.csproj" />
+  <Project Path="HierarchicalExpand.Runtime/HierarchicalExpand.Runtime.csproj" />
   <Project Path="HierarchicalExpand.Tests/HierarchicalExpand.Tests.csproj" />
   
   <Project Path="HierarchicalExpand/HierarchicalExpand.csproj" />

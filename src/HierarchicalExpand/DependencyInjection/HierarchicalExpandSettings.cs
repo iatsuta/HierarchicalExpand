@@ -1,4 +1,5 @@
 ﻿using CommonFramework.DependencyInjection;
+using CommonFramework.IdentitySource.DependencyInjection;
 
 using HierarchicalExpand.AncestorDenormalization;
 
@@ -8,24 +9,26 @@ namespace HierarchicalExpand.DependencyInjection;
 
 public class HierarchicalExpandSettings : IHierarchicalExpandSettings
 {
-	private readonly List<Action<IServiceCollection>> actions = new();
+    private readonly List<Action<IServiceCollection>> actions = new();
 
-	public void Initialize(IServiceCollection services)
-	{
-		foreach (var action in this.actions)
-		{
-			action(services);
-		}
+    public void Initialize(IServiceCollection services)
+    {
+        services.AddIdentitySource();
 
-		if (!this.AlreadyInitialized(services))
-		{
-			this.RegisterGeneralServices(services);
-		}
-	}
+        foreach (var action in this.actions)
+        {
+            action(services);
+        }
 
-	public IHierarchicalExpandSettings AddHierarchicalInfo<TDomainObject>(
-		HierarchicalInfo<TDomainObject> hierarchicalInfo,
-		FullAncestorLinkInfo<TDomainObject> fullAncestorLinkInfo)
+        if (!services.AlreadyInitialized<IHierarchicalInfoSource>())
+        {
+            this.RegisterGeneralServices(services);
+        }
+    }
+
+    public IHierarchicalExpandSettings AddHierarchicalInfo<TDomainObject>(
+        HierarchicalInfo<TDomainObject> hierarchicalInfo,
+        FullAncestorLinkInfo<TDomainObject> fullAncestorLinkInfo)
     {
         this.actions.Add(services =>
         {
@@ -41,23 +44,18 @@ public class HierarchicalExpandSettings : IHierarchicalExpandSettings
             services.AddSingleton(directLinkType, fullAncestorLinkInfo);
         });
 
-		return this;
-	}
+        return this;
+    }
 
-	private IServiceCollection RegisterGeneralServices(IServiceCollection services)
-	{
-		return services
+    private IServiceCollection RegisterGeneralServices(IServiceCollection services)
+    {
+        return services
             .AddServiceProxyFactory()
-			.AddScoped(typeof(IDenormalizedAncestorsService<>), typeof(DenormalizedAncestorsService<>))
-			.AddScoped(typeof(IAncestorLinkExtractor<,>), typeof(AncestorLinkExtractor<,>))
-			.AddSingleton<IRealTypeResolver, IdentityRealTypeResolver>()
-			.AddScoped<IHierarchicalObjectExpanderFactory, HierarchicalObjectExpanderFactory>()
-			.AddScoped(typeof(IDomainObjectExpander<>), typeof(DomainObjectExpander<>))
-			.AddSingleton<IHierarchicalInfoSource, HierarchicalInfoSource>();
-	}
-
-	private bool AlreadyInitialized(IServiceCollection services)
-	{
-		return services.Any(sd => !sd.IsKeyedService && sd.Lifetime == ServiceLifetime.Singleton && sd.ServiceType == typeof(IHierarchicalInfoSource));
-	}
+            .AddScoped(typeof(IDenormalizedAncestorsService<>), typeof(DenormalizedAncestorsService<>))
+            .AddScoped(typeof(IAncestorLinkExtractor<,>), typeof(AncestorLinkExtractor<,>))
+            .AddSingleton<IRealTypeResolver, IdentityRealTypeResolver>()
+            .AddScoped<IHierarchicalObjectExpanderFactory, HierarchicalObjectExpanderFactory>()
+            .AddScoped(typeof(IDomainObjectExpander<>), typeof(DomainObjectExpander<>))
+            .AddSingleton<IHierarchicalInfoSource, HierarchicalInfoSource>();
+    }
 }
