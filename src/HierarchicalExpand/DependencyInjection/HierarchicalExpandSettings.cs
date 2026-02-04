@@ -51,6 +51,7 @@ public class HierarchicalExpandSettings : IHierarchicalExpandSettings
     {
         return services
             .AddServiceProxyFactory()
+            .AddScoped<IDenormalizedAncestorsService, DenormalizedAncestorsService>()
             .AddScoped(typeof(IDenormalizedAncestorsService<>), typeof(DenormalizedAncestorsService<>))
             .AddScoped(typeof(IAncestorLinkExtractor<,>), typeof(AncestorLinkExtractor<,>))
             .AddSingleton<IRealTypeResolver, IdentityRealTypeResolver>()

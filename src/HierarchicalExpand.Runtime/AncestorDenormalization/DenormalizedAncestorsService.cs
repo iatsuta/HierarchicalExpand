@@ -1,7 +1,26 @@
 ﻿using CommonFramework;
 using CommonFramework.GenericRepository;
 
+using Microsoft.Extensions.DependencyInjection;
+
 namespace HierarchicalExpand.AncestorDenormalization;
+
+public class DenormalizedAncestorsService(IServiceProvider serviceProvider, IEnumerable<FullAncestorLinkInfo> fullAncestorLinkInfoList)
+    : IDenormalizedAncestorsService
+{
+    public async Task Initialize(CancellationToken cancellationToken)
+    {
+        foreach (var fullAncestorLinkInfo in fullAncestorLinkInfoList)
+        {
+            var initializer =
+                (IDenormalizedAncestorsService)serviceProvider.GetRequiredService(
+                    typeof(IDenormalizedAncestorsService<>).MakeGenericType(fullAncestorLinkInfo.DomainObjectType));
+
+            await initializer.Initialize(cancellationToken);
+        }
+    }
+}
+
 
 public class DenormalizedAncestorsService<TDomainObject>(IServiceProxyFactory serviceProxyFactory, FullAncestorLinkInfo<TDomainObject> fullAncestorLinkInfo) : IDenormalizedAncestorsService<TDomainObject>
 {
@@ -12,8 +31,8 @@ public class DenormalizedAncestorsService<TDomainObject>(IServiceProxyFactory se
 	public Task SyncUpAsync(TDomainObject domainObject, CancellationToken cancellationToken) =>
 		this.innerService.SyncUpAsync(domainObject, cancellationToken);
 
-	public Task SyncAllAsync(CancellationToken cancellationToken) =>
-		this.innerService.SyncAllAsync(cancellationToken);
+	public Task Initialize(CancellationToken cancellationToken) =>
+		this.innerService.Initialize(cancellationToken);
 
 	public Task SyncAsync(IEnumerable<TDomainObject> updatedDomainObjectsBase, IEnumerable<TDomainObject> removedDomainObjects, CancellationToken cancellationToken) =>
 		this.innerService.SyncAsync(updatedDomainObjectsBase, removedDomainObjects, cancellationToken);
@@ -33,7 +52,7 @@ public class DenormalizedAncestorsService<TDomainObject, TDirectAncestorLink>(
         await this.ApplySync(syncResult, cancellationToken);
     }
 
-    public async Task SyncAllAsync(CancellationToken cancellationToken)
+    public async Task Initialize(CancellationToken cancellationToken)
     {
         var syncResult = await ancestorLinkExtractor.GetSyncAllResult(cancellationToken);
 
