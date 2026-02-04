@@ -3,7 +3,7 @@ using HierarchicalExpand.IntegrationTests.Domain;
 
 namespace HierarchicalExpand.IntegrationTests;
 
-public class TestDataInitializer(TestDbContext dbContext, IDenormalizedAncestorsService<BusinessUnit> denormalizedAncestorsService)
+public class TestDataInitializer(TestDbContext dbContext, IDenormalizedAncestorsService denormalizedAncestorsService)
 {
     public async Task Initialize(CancellationToken cancellationToken)
     {
@@ -21,7 +21,7 @@ public class TestDataInitializer(TestDbContext dbContext, IDenormalizedAncestors
 
         await dbContext.SaveChangesAsync(cancellationToken);
 
-        await denormalizedAncestorsService.SyncAllAsync(cancellationToken);
+        await denormalizedAncestorsService.Initialize(cancellationToken);
 
         await dbContext.SaveChangesAsync(cancellationToken);
     }
