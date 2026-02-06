@@ -14,8 +14,6 @@ public class DiTests
 	public async Task GetParents_ResultCorrect()
 	{
 		// Arrange
-		var ct = TestContext.Current.CancellationToken;
-
 		var queryableSource = Substitute.For<IQueryableSource>();
 		queryableSource.GetQueryable<DomainObject>().Returns(_ => AllNodes.AsQueryable());
 		queryableSource.GetQueryable<DirectAncestorLink>().Returns(_ => GetDirectAncestorLinks().AsQueryable());
