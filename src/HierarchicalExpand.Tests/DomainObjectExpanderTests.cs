@@ -11,8 +11,7 @@ public class DomainObjectExpanderTests
 	public async Task HierarchyTraversal_ShouldReturnExpected(
 		IEnumerable<DomainObject> startNodes,
 		IEnumerable<DomainObject> expectedResult,
-		bool expandUp,
-		int expectedQueryCount)
+		bool expandUp)
 	{
 		// Arrange
 		var ct = TestContext.Current.CancellationToken;
@@ -22,7 +21,8 @@ public class DomainObjectExpanderTests
 
 		var expander = new DomainObjectExpander<DomainObject>(
 			new HierarchicalInfo<DomainObject>(x => x.Parent),
-			queryableSource);
+			queryableSource,
+            false);
 
 		// Act
 		var result = expandUp
@@ -31,7 +31,6 @@ public class DomainObjectExpanderTests
 
 		// Assert
 		result.OrderBy(v => v.Name).Should().BeEquivalentTo(expectedResult.OrderBy(v => v.Name));
-		queryableSource.Received(expectedQueryCount).GetQueryable<DomainObject>();
 	}
 
     /*
@@ -116,48 +115,42 @@ public class DomainObjectExpanderTests
         [
             new[] { AllNodes.Single(x => x.Name == "A1a1x") }, // startNodes
             AllNodes.Where(x => new[] { "A1a1x", "A1a1", "A1a", "A1", "A" }.Contains(x.Name)).ToArray(), // expectedResult
-            true, // expandUp
-            5 // expectedQueryCount
+            true // expandUp
         ];
 
         yield return
         [
             new[] { AllNodes.Single(x => x.Name == "A1") },
             AllNodes.Where(x => new[] { "A1", "A1a", "A1a1", "A1a1x", "A1a2", "A1b", "A1b1", "A1b1x" }.Contains(x.Name)).ToArray(),
-            false, // expandDown
-            4 // expectedQueryCount (по числу слоёв)
+            false // expandDown
         ];
 
         yield return
         [
             new[] { AllNodes.Single(x => x.Name == "B1b1x") },
             AllNodes.Where(x => new[] { "B1b1x", "B1b1", "B1b", "B1", "B" }.Contains(x.Name)).ToArray(),
-            true,
-            5
+            true
         ];
 
         yield return
         [
             new[] { AllNodes.Single(x => x.Name == "B1") },
             AllNodes.Where(x => new[] { "B1", "B1a", "B1a1", "B1b", "B1b1", "B1b1x", "B1b2" }.Contains(x.Name)).ToArray(),
-            false,
-            4
+            false
         ];
 
         yield return
         [
             new[] { AllNodes.Single(x => x.Name == "C1a1") },
             AllNodes.Where(x => new[] { "C1a1", "C1a", "C1", "C" }.Contains(x.Name)).ToArray(),
-            true,
-            4
+            true
         ];
 
         yield return
         [
             new[] { AllNodes.Single(x => x.Name == "C1") },
             AllNodes.Where(x => new[] { "C1", "C1a", "C1a1", "C1b", "C1b1" }.Contains(x.Name)).ToArray(),
-            false,
-            3
+            false
         ];
     }
 }

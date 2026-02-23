@@ -56,7 +56,7 @@ public class HierarchicalExpandSettings : IHierarchicalExpandSettings
             .AddScoped(typeof(IAncestorLinkExtractor<,>), typeof(AncestorLinkExtractor<,>))
             .AddSingleton<IRealTypeResolver, IdentityRealTypeResolver>()
             .AddScoped<IHierarchicalObjectExpanderFactory, HierarchicalObjectExpanderFactory>()
-            .AddScoped(typeof(IDomainObjectExpander<>), typeof(DomainObjectExpander<>))
+            .AddScoped(typeof(IDomainObjectExpanderFactory<>), typeof(DomainObjectExpanderFactory<>))
             .AddSingleton<IHierarchicalInfoSource, HierarchicalInfoSource>();
     }
 }
