@@ -3,10 +3,10 @@
 namespace HierarchicalExpand.AncestorDenormalization;
 
 public record SyncResult<TDomainObject, TDirectAncestorLink>(
-    DeepEqualsCollection<AncestorLinkInfo<TDomainObject>> Adding,
+    DeepEqualsCollection<AncestorLinkData<TDomainObject>> Adding,
     DeepEqualsCollection<TDirectAncestorLink> Removing)
 {
-    public SyncResult(IEnumerable<AncestorLinkInfo<TDomainObject>> adding,
+    public SyncResult(IEnumerable<AncestorLinkData<TDomainObject>> adding,
         IEnumerable<TDirectAncestorLink> removing) :
         this(DeepEqualsCollection.Create(adding), DeepEqualsCollection.Create(removing))
     {

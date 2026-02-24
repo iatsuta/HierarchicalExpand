@@ -1,9 +1,11 @@
-﻿using HierarchicalExpand.AncestorDenormalization;
+﻿using CommonFramework;
+
+using HierarchicalExpand.AncestorDenormalization;
 using HierarchicalExpand.IntegrationTests.Domain;
 
 namespace HierarchicalExpand.IntegrationTests;
 
-public class TestDataInitializer(TestDbContext dbContext, IDenormalizedAncestorsService denormalizedAncestorsService)
+public class TestDataInitializer(TestDbContext dbContext, IDenormalizedAncestorsService denormalizedAncestorsService) : IInitializer
 {
     public async Task Initialize(CancellationToken cancellationToken)
     {

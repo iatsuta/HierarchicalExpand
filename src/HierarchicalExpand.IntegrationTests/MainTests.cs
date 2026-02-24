@@ -1,7 +1,7 @@
 ﻿using CommonFramework.GenericRepository;
 
 using GenericQueryable;
-
+using HierarchicalExpand.AncestorDenormalization;
 using HierarchicalExpand.IntegrationTests.Domain;
 
 using Microsoft.Extensions.DependencyInjection;
@@ -80,5 +80,22 @@ public class MainTests : TestBase
 
         // Assert
         result.OrderBy(v => v).Should().BeEquivalentTo(expectedBuIdents);
+    }
+
+
+    [Fact]
+    public async Task GetSyncAllResult_ReturnsEmpty_WhenNoChangesDetected()
+    {
+        // Arrange
+        var cancellationToken = TestContext.Current.CancellationToken;
+        await using var scope = this.RootServiceProvider.CreateAsyncScope();
+
+        var ancestorLinkExtractor = scope.ServiceProvider.GetRequiredService<IAncestorLinkExtractor<BusinessUnit, BusinessUnitDirectAncestorLink>>();
+
+        // Act
+        var result = await ancestorLinkExtractor.GetSyncAllResult(cancellationToken);
+
+        // Assert
+        result.Should().Be(SyncResult<BusinessUnit, BusinessUnitDirectAncestorLink>.Empty);
     }
 }

@@ -1,7 +1,11 @@
-﻿using CommonFramework.GenericRepository;
+﻿using CommonFramework.DependencyInjection;
+using CommonFramework.GenericRepository;
 
 using HierarchicalExpand.AncestorDenormalization;
+using HierarchicalExpand.DependencyInjection;
 using HierarchicalExpand.Tests.Domain;
+
+using Microsoft.Extensions.DependencyInjection;
 
 namespace HierarchicalExpand.Tests;
 
@@ -18,28 +22,36 @@ public class AncestorLinkExtractorTests
 		queryableSource.GetQueryable<DomainObject>().Returns(testCase.Nodes.AsQueryable());
 		queryableSource.GetQueryable<DirectAncestorLink>().Returns(testCase.ExistingOldLinks.AsQueryable());
 
-		var extractor = new AncestorLinkExtractor<DomainObject, DirectAncestorLink>(
-			queryableSource,
-			new DomainObjectExpander<DomainObject>(new HierarchicalInfo<DomainObject>(v => v.Parent), queryableSource),
-			new FullAncestorLinkInfo<DomainObject, DirectAncestorLink, UnDirectAncestorLink>(
-				new AncestorLinkInfo<DomainObject, DirectAncestorLink>(l => l.From, l => l.To),
-				new AncestorLinkInfo<DomainObject, UnDirectAncestorLink>(l => l.From, l => l.To)));
+        var serviceProvider = new ServiceCollection()
 
-		// Act
-		foreach (var pair in testCase.UpdateParents)
-		{
-			pair.Key.Parent = pair.Value;
-		}
+            .AddHierarchicalExpand(scb => scb
+                .AddHierarchicalInfo(
+                    v => v.Parent,
+                    new AncestorLinkInfo<DomainObject, DirectAncestorLink>(link => link.From, link => link.To),
+                    new AncestorLinkInfo<DomainObject, UnDirectAncestorLink>(view => view.From, view => view.To)))
+            .AddScoped(_ => queryableSource)
+            .AddValidator<DuplicateServiceUsageValidator>()
+            .Validate()
+            .BuildServiceProvider(new ServiceProviderOptions { ValidateOnBuild = true, ValidateScopes = true });
 
-		var result = await extractor.GetSyncResult(testCase.UpdateParents.Keys, [], ct);
+        await using var scope = serviceProvider.CreateAsyncScope();
+        var ancestorLinkExtractor = scope.ServiceProvider.GetRequiredService<IAncestorLinkExtractor<DomainObject, DirectAncestorLink>>();
 
-		// Assert
-		var orderedResult =
-			new SyncResult<DomainObject, DirectAncestorLink>(
-				result.Adding.OrderBy(link => link.Ancestor.Name).ThenBy(link => link.Child.Name),
-				result.Removing.OrderBy(link => link.From.Name).ThenBy(link => link.To.Name));
+        // Act
+        foreach (var pair in testCase.UpdateParents)
+        {
+            pair.Key.Parent = pair.Value;
+        }
 
-		orderedResult.Should().Be(testCase.ExpectedResult);
+        var result = await ancestorLinkExtractor.GetSyncResult(testCase.UpdateParents.Keys, [], ct);
+
+        // Assert
+        var orderedResult =
+            new SyncResult<DomainObject, DirectAncestorLink>(
+                result.Adding.OrderBy(link => link.Ancestor.Name).ThenBy(link => link.Child.Name),
+                result.Removing.OrderBy(link => link.From.Name).ThenBy(link => link.To.Name));
+
+        orderedResult.Should().Be(testCase.ExpectedResult);
 	}
 
     public record MoveTestCase(
@@ -136,9 +148,9 @@ public class AncestorLinkExtractorTests
         var expectedResult = new SyncResult<DomainObject, DirectAncestorLink>(
             new[]
             {
-                new AncestorLinkInfo<DomainObject>(a2, b1),
-                new AncestorLinkInfo<DomainObject>(a2, c1),
-                new AncestorLinkInfo<DomainObject>(a2, c2)
+                new AncestorLinkData<DomainObject>(a2, b1),
+                new AncestorLinkData<DomainObject>(a2, c1),
+                new AncestorLinkData<DomainObject>(a2, c2)
             },
             new[]
             {
@@ -241,16 +253,16 @@ public class AncestorLinkExtractorTests
         var expectedResult = new SyncResult<DomainObject, DirectAncestorLink>(
             new[]
             {
-                new AncestorLinkInfo<DomainObject>(a2, a1B1),
-                new AncestorLinkInfo<DomainObject>(a2, a1B1A),
-                new AncestorLinkInfo<DomainObject>(a2, a1B1B),
-                new AncestorLinkInfo<DomainObject>(a2, a1B1B1),
-                new AncestorLinkInfo<DomainObject>(a2, a1B1C),
-                new AncestorLinkInfo<DomainObject>(a2A, a1B1),
-                new AncestorLinkInfo<DomainObject>(a2A, a1B1A),
-                new AncestorLinkInfo<DomainObject>(a2A, a1B1B),
-                new AncestorLinkInfo<DomainObject>(a2A, a1B1B1),
-                new AncestorLinkInfo<DomainObject>(a2A, a1B1C)
+                new AncestorLinkData<DomainObject>(a2, a1B1),
+                new AncestorLinkData<DomainObject>(a2, a1B1A),
+                new AncestorLinkData<DomainObject>(a2, a1B1B),
+                new AncestorLinkData<DomainObject>(a2, a1B1B1),
+                new AncestorLinkData<DomainObject>(a2, a1B1C),
+                new AncestorLinkData<DomainObject>(a2A, a1B1),
+                new AncestorLinkData<DomainObject>(a2A, a1B1A),
+                new AncestorLinkData<DomainObject>(a2A, a1B1B),
+                new AncestorLinkData<DomainObject>(a2A, a1B1B1),
+                new AncestorLinkData<DomainObject>(a2A, a1B1C)
             },
             new[]
             {
