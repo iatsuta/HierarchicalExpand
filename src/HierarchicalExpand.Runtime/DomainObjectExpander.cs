@@ -14,37 +14,13 @@ public class DomainObjectExpander<TDomainObject>(HierarchicalInfo<TDomainObject>
     {
         var allResult = startDomainObjects.ToHashSet();
 
-        if (allResult.Count == 1)
-        {
-            return await this.GetAllParents(allResult.Single(), cancellationToken);
-        }
-        else if (allResult.Count != 0)
-        {
-            var cache = await this.GetCache(cancellationToken);
-
-            for (var nextLayer = allResult; nextLayer.Any(); allResult.UnionWith(nextLayer))
-            {
-                nextLayer = cache.Where(pair => nextLayer.Contains(pair.Key) && pair.Value != null)
-                    .Select(pair => pair.Value!)
-                    .ToHashSet();
-            }
-        }
-
-        return allResult;
-    }
-
-    private async Task<HashSet<TDomainObject>> GetAllParents(TDomainObject startDomainObject, CancellationToken cancellationToken)
-    {
-        var allResult = new[] { startDomainObject }.ToHashSet();
-
         for (var nextLayer = allResult; nextLayer.Any(); allResult.UnionWith(nextLayer))
         {
-            nextLayer = await queryableSource.GetQueryable<TDomainObject>()
-                .Where(currentObj => nextLayer.Contains(currentObj))
-                .Select(hierarchicalInfo.ParentPath)
+            nextLayer = nextLayer
+                .Select(hierarchicalInfo.ParentFunc)
                 .Where(nextObj => nextObj != null && !allResult.Contains(nextObj))
                 .Select(nextObj => nextObj!)
-                .GenericToHashSetAsync(cancellationToken);
+                .ToHashSet();
         }
 
         return allResult;
