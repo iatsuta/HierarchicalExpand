@@ -4,7 +4,7 @@ using CommonFramework.GenericRepository;
 using GenericQueryable;
 using GenericQueryable.Fetching;
 
-namespace HierarchicalExpand.AncestorDenormalization;
+namespace HierarchicalExpand.Denormalization;
 
 public class AncestorLinkExtractor<TDomainObject, TDirectAncestorLink>(
     IQueryableSource queryableSource,
