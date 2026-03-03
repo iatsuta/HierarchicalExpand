@@ -29,6 +29,13 @@ public class TestDbContext(DbContextOptions<TestDbContext> options) : DbContext(
             entity.Property(e => e.Name).IsRequired().HasMaxLength(DefaultMaxLength);
             entity.HasOne(e => e.Parent).WithMany().HasForeignKey($"{nameof(BusinessUnit.Parent)}{DefaultIdPostfix}").IsRequired(false);
         }
+
+        {
+            var entity = modelBuilder.Entity<TestHierarchicalObject>().ToTable(nameof(TestHierarchicalObject), DefaultSchema);
+            entity.HasKey(v => v.Id);
+
+            entity.HasOne(e => e.Parent).WithMany().HasForeignKey($"{nameof(TestHierarchicalObject.Parent)}{DefaultIdPostfix}").IsRequired(false);
+        }
     }
 
     private void InitAncestors(ModelBuilder modelBuilder)
@@ -53,11 +60,32 @@ public class TestDbContext(DbContextOptions<TestDbContext> options) : DbContext(
             entity.HasOne(e => e.Source).WithMany().HasForeignKey($"{nameof(BusinessUnitUndirectAncestorLink.Source)}{DefaultIdPostfix}").IsRequired();
             entity.HasOne(e => e.Target).WithMany().HasForeignKey($"{nameof(BusinessUnitUndirectAncestorLink.Target)}{DefaultIdPostfix}").IsRequired();
         }
+
+        {
+            var entity = modelBuilder.Entity<TestHierarchicalObjectDirectAncestorLink>().ToTable(nameof(TestHierarchicalObjectDirectAncestorLink), DefaultSchema);
+            entity.HasKey(v => v.Id);
+
+            var ancestorKey = $"{nameof(TestHierarchicalObjectDirectAncestorLink.Ancestor)}{DefaultIdPostfix}";
+            var childKey = $"{nameof(TestHierarchicalObjectDirectAncestorLink.Child)}{DefaultIdPostfix}";
+
+            entity.HasOne(e => e.Ancestor).WithMany().HasForeignKey(ancestorKey).IsRequired();
+            entity.HasOne(e => e.Child).WithMany().HasForeignKey(childKey).IsRequired();
+
+            entity.HasIndex(ancestorKey, childKey).IsUnique();
+        }
+
+        {
+            var entity = modelBuilder.Entity<TestHierarchicalObjectUndirectAncestorLink>().ToView(nameof(TestHierarchicalObjectUndirectAncestorLink), DefaultSchema);
+            entity.HasNoKey();
+
+            entity.HasOne(e => e.Source).WithMany().HasForeignKey($"{nameof(TestHierarchicalObjectUndirectAncestorLink.Source)}{DefaultIdPostfix}").IsRequired();
+            entity.HasOne(e => e.Target).WithMany().HasForeignKey($"{nameof(TestHierarchicalObjectUndirectAncestorLink.Target)}{DefaultIdPostfix}").IsRequired();
+        }
     }
 
     public async Task EnsureViewsCreatedAsync(CancellationToken cancellationToken = default)
     {
-        await Database.ExecuteSqlRawAsync(@$"
+        await this.Database.ExecuteSqlRawAsync(@$"
 CREATE VIEW {nameof(BusinessUnitUndirectAncestorLink)}
 AS
 SELECT ancestorId as sourceId, childId as targetId
@@ -66,5 +94,16 @@ UNION
 SELECT childId as sourceId, ancestorId as targetId
 FROM {nameof(BusinessUnitDirectAncestorLink)}
 ", cancellationToken);
+
+        await this.Database.ExecuteSqlRawAsync(@$"
+CREATE VIEW {nameof(TestHierarchicalObjectUndirectAncestorLink)}
+AS
+SELECT ancestorId as sourceId, childId as targetId
+FROM {nameof(TestHierarchicalObjectDirectAncestorLink)}
+UNION
+SELECT childId as sourceId, ancestorId as targetId
+FROM {nameof(TestHierarchicalObjectDirectAncestorLink)}
+", cancellationToken);
+
     }
 }
