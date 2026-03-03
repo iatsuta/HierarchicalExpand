@@ -82,7 +82,6 @@ public class MainTests : TestBase
         result.OrderBy(v => v).Should().BeEquivalentTo(expectedBuIdents);
     }
 
-
     [Fact]
     public async Task GetSyncAllResult_ReturnsEmpty_WhenNoChangesDetected()
     {
