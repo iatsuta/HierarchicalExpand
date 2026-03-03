@@ -1,7 +1,7 @@
 ﻿using CommonFramework.DependencyInjection;
 using CommonFramework.IdentitySource.DependencyInjection;
 
-using HierarchicalExpand.AncestorDenormalization;
+using HierarchicalExpand.Denormalization;
 
 using Microsoft.Extensions.DependencyInjection;
 
@@ -28,7 +28,8 @@ public class HierarchicalExpandSettings : IHierarchicalExpandSettings
 
     public IHierarchicalExpandSettings AddHierarchicalInfo<TDomainObject>(
         HierarchicalInfo<TDomainObject> hierarchicalInfo,
-        FullAncestorLinkInfo<TDomainObject> fullAncestorLinkInfo)
+        FullAncestorLinkInfo<TDomainObject> fullAncestorLinkInfo,
+        DeepLevelInfo<TDomainObject>? deepLevelInfo = null)
     {
         this.actions.Add(services =>
         {
@@ -42,6 +43,12 @@ public class HierarchicalExpandSettings : IHierarchicalExpandSettings
                 typeof(FullAncestorLinkInfo<,>).MakeGenericType(fullAncestorLinkInfo.DomainObjectType, fullAncestorLinkInfo.DirectedLinkType);
 
             services.AddSingleton(directLinkType, fullAncestorLinkInfo);
+
+            if (deepLevelInfo != null)
+            {
+                services.AddSingleton<DeepLevelInfo>(deepLevelInfo);
+                services.AddSingleton(deepLevelInfo);
+            }
         });
 
         return this;
@@ -51,8 +58,10 @@ public class HierarchicalExpandSettings : IHierarchicalExpandSettings
     {
         return services
             .AddServiceProxyFactory()
-            .AddScoped<IDenormalizedAncestorsService, DenormalizedAncestorsService>()
-            .AddScoped(typeof(IDenormalizedAncestorsService<>), typeof(DenormalizedAncestorsService<>))
+            .AddScoped<IDeepLevelDenormalizer, DeepLevelDenormalizer>()
+            .AddScoped(typeof(IDeepLevelDenormalizer<>), typeof(DeepLevelDenormalizer<>))
+            .AddScoped<IAncestorDenormalizer, AncestorDenormalizer>()
+            .AddScoped(typeof(IAncestorDenormalizer<>), typeof(AncestorDenormalizer<>))
             .AddScoped(typeof(IAncestorLinkExtractor<,>), typeof(AncestorLinkExtractor<,>))
             .AddSingleton<IRealTypeResolver, IdentityRealTypeResolver>()
             .AddScoped<IHierarchicalObjectExpanderFactory, HierarchicalObjectExpanderFactory>()

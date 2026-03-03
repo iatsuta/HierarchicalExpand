@@ -29,11 +29,13 @@ public abstract class TestBase : IAsyncLifetime
                     .AddHierarchicalInfo(
                         v => v.Parent,
                         new AncestorLinkInfo<BusinessUnit, BusinessUnitDirectAncestorLink>(link => link.Ancestor, link => link.Child),
-                        new AncestorLinkInfo<BusinessUnit, BusinessUnitUndirectAncestorLink>(view => view.Source, view => view.Target))
+                        new AncestorLinkInfo<BusinessUnit, BusinessUnitUndirectAncestorLink>(view => view.Source, view => view.Target),
+                        v => v.DeepLevel)
                     .AddHierarchicalInfo(
                         v => v.Parent,
                         new AncestorLinkInfo<TestHierarchicalObject, TestHierarchicalObjectDirectAncestorLink>(link => link.Ancestor, link => link.Child),
-                        new AncestorLinkInfo<TestHierarchicalObject, TestHierarchicalObjectUndirectAncestorLink>(view => view.Source, view => view.Target)))
+                        new AncestorLinkInfo<TestHierarchicalObject, TestHierarchicalObjectUndirectAncestorLink>(view => view.Source, view => view.Target),
+                        v => v.DeepLevel))
 
                 .AddScoped<IQueryableSource, EfQueryableSource>()
                 .AddScoped<IGenericRepository, EfGenericRepository>()

@@ -7,4 +7,6 @@ public class BusinessUnit
     public virtual BusinessUnit? Parent { get; set; }
 
     public required string Name { get; set; }
+
+    public int DeepLevel { get; set; }
 }

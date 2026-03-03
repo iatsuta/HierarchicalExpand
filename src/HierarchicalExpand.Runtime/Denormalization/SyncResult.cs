@@ -1,6 +1,6 @@
 ﻿using CommonFramework;
 
-namespace HierarchicalExpand.AncestorDenormalization;
+namespace HierarchicalExpand.Denormalization;
 
 public record SyncResult<TDomainObject, TDirectAncestorLink>(
     DeepEqualsCollection<AncestorLinkData<TDomainObject>> Adding,

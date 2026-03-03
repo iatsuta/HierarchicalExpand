@@ -1,10 +1,10 @@
 ﻿using CommonFramework;
 
-namespace HierarchicalExpand.AncestorDenormalization;
+namespace HierarchicalExpand.Denormalization;
 
-public interface IDenormalizedAncestorsService : IInitializer;
+public interface IAncestorDenormalizer : IInitializer;
 
-public interface IDenormalizedAncestorsService<in TDomainObject> : IDenormalizedAncestorsService
+public interface IAncestorDenormalizer<in TDomainObject> : IAncestorDenormalizer
 {
     Task SyncUpAsync(TDomainObject domainObject, CancellationToken cancellationToken);
 

@@ -1,4 +1,4 @@
-﻿namespace HierarchicalExpand.AncestorDenormalization;
+﻿namespace HierarchicalExpand.Denormalization;
 
 public static class SyncResultExtensions
 {

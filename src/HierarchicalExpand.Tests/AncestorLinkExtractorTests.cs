@@ -1,7 +1,7 @@
 ﻿using CommonFramework.DependencyInjection;
 using CommonFramework.GenericRepository;
 
-using HierarchicalExpand.AncestorDenormalization;
+using HierarchicalExpand.Denormalization;
 using HierarchicalExpand.DependencyInjection;
 using HierarchicalExpand.Tests.Domain;
 

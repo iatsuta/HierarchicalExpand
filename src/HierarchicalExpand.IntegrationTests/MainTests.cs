@@ -1,7 +1,7 @@
 ﻿using CommonFramework.GenericRepository;
 
 using GenericQueryable;
-using HierarchicalExpand.AncestorDenormalization;
+using HierarchicalExpand.Denormalization;
 using HierarchicalExpand.IntegrationTests.Domain;
 
 using Microsoft.Extensions.DependencyInjection;

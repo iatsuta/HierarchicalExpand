@@ -3,30 +3,29 @@ using CommonFramework.GenericRepository;
 
 using Microsoft.Extensions.DependencyInjection;
 
-namespace HierarchicalExpand.AncestorDenormalization;
+namespace HierarchicalExpand.Denormalization;
 
-public class DenormalizedAncestorsService(IServiceProvider serviceProvider, IEnumerable<FullAncestorLinkInfo> fullAncestorLinkInfoList)
-    : IDenormalizedAncestorsService
+public class AncestorDenormalizer(IServiceProvider serviceProvider, IEnumerable<FullAncestorLinkInfo> fullAncestorLinkInfoList)
+    : IAncestorDenormalizer
 {
     public async Task Initialize(CancellationToken cancellationToken)
     {
         foreach (var fullAncestorLinkInfo in fullAncestorLinkInfoList)
         {
             var initializer =
-                (IDenormalizedAncestorsService)serviceProvider.GetRequiredService(
-                    typeof(IDenormalizedAncestorsService<>).MakeGenericType(fullAncestorLinkInfo.DomainObjectType));
+                (IAncestorDenormalizer)serviceProvider.GetRequiredService(
+                    typeof(IAncestorDenormalizer<>).MakeGenericType(fullAncestorLinkInfo.DomainObjectType));
 
             await initializer.Initialize(cancellationToken);
         }
     }
 }
 
-
-public class DenormalizedAncestorsService<TDomainObject>(IServiceProxyFactory serviceProxyFactory, FullAncestorLinkInfo<TDomainObject> fullAncestorLinkInfo) : IDenormalizedAncestorsService<TDomainObject>
+public class AncestorDenormalizer<TDomainObject>(IServiceProxyFactory serviceProxyFactory, FullAncestorLinkInfo<TDomainObject> fullAncestorLinkInfo) : IAncestorDenormalizer<TDomainObject>
 {
-    private readonly IDenormalizedAncestorsService<TDomainObject> innerService =
-        serviceProxyFactory.Create<IDenormalizedAncestorsService<TDomainObject>>(
-            typeof(DenormalizedAncestorsService<,>).MakeGenericType(typeof(TDomainObject), fullAncestorLinkInfo.DirectedLinkType));
+    private readonly IAncestorDenormalizer<TDomainObject> innerService =
+        serviceProxyFactory.Create<IAncestorDenormalizer<TDomainObject>>(
+            typeof(AncestorDenormalizer<,>).MakeGenericType(typeof(TDomainObject), fullAncestorLinkInfo.DirectedLinkType));
 
 	public Task SyncUpAsync(TDomainObject domainObject, CancellationToken cancellationToken) =>
 		this.innerService.SyncUpAsync(domainObject, cancellationToken);
@@ -38,10 +37,10 @@ public class DenormalizedAncestorsService<TDomainObject>(IServiceProxyFactory se
 		this.innerService.SyncAsync(updatedDomainObjectsBase, removedDomainObjects, cancellationToken);
 }
 
-public class DenormalizedAncestorsService<TDomainObject, TDirectAncestorLink>(
+public class AncestorDenormalizer<TDomainObject, TDirectAncestorLink>(
     IGenericRepository genericRepository,
     FullAncestorLinkInfo<TDomainObject, TDirectAncestorLink> fullAncestorLinkInfo,
-    IAncestorLinkExtractor<TDomainObject, TDirectAncestorLink> ancestorLinkExtractor) : IDenormalizedAncestorsService<TDomainObject>
+    IAncestorLinkExtractor<TDomainObject, TDirectAncestorLink> ancestorLinkExtractor) : IAncestorDenormalizer<TDomainObject>
     where TDirectAncestorLink : class, new()
     where TDomainObject : class
 {
