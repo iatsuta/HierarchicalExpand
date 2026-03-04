@@ -7,9 +7,9 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace HierarchicalExpand.DependencyInjection;
 
-public class HierarchicalExpandSettings : IHierarchicalExpandSettings
+public class HierarchicalExpandBuilder : IHierarchicalExpandBuilder, IServiceCollectionBuilder
 {
-    private readonly List<Action<IServiceCollection>> actions = new();
+    private readonly List<Action<IServiceCollection>> actions = [];
 
     public void Initialize(IServiceCollection services)
     {
@@ -26,7 +26,7 @@ public class HierarchicalExpandSettings : IHierarchicalExpandSettings
         }
     }
 
-    public IHierarchicalExpandSettings AddHierarchicalInfo<TDomainObject>(
+    public IHierarchicalExpandBuilder AddHierarchicalInfo<TDomainObject>(
         HierarchicalInfo<TDomainObject> hierarchicalInfo,
         FullAncestorLinkInfo<TDomainObject> fullAncestorLinkInfo,
         DeepLevelInfo<TDomainObject>? deepLevelInfo = null)
