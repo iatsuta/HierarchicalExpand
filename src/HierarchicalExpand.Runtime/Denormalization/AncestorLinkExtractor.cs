@@ -37,8 +37,10 @@ public class AncestorLinkExtractor<TDomainObject, TDirectAncestorLink>(
     {
         var domainObjectExpander = domainObjectExpanderFactory.Create();
 
-        var existsLinkInfos =
-            await updatedDomainObjectsBase.SyncWhenAll(domainObject => this.GetSyncResult(domainObject, domainObjectExpander, cancellationToken));
+        var existsLinkInfos = await updatedDomainObjectsBase
+            .ToAsyncEnumerable()
+            .Select(async (domainObject, ct) => await this.GetSyncResult(domainObject, domainObjectExpander, ct))
+            .ToArrayAsync(cancellationToken);
 
         var forceRemovedLinks = await this.GetExistsLinks(removedDomainObjects, cancellationToken);
 
@@ -50,8 +52,10 @@ public class AncestorLinkExtractor<TDomainObject, TDirectAncestorLink>(
     public Task<SyncResult<TDomainObject, TDirectAncestorLink>> GetSyncResult(TDomainObject domainObject, CancellationToken cancellationToken) =>
         this.GetSyncResult([domainObject], [], cancellationToken);
 
-    private async Task<SyncResult<TDomainObject, TDirectAncestorLink>> GetSyncResult(TDomainObject domainObject,
-        IDomainObjectExpander<TDomainObject> domainObjectExpander, CancellationToken cancellationToken)
+    private async Task<SyncResult<TDomainObject, TDirectAncestorLink>> GetSyncResult(
+        TDomainObject domainObject,
+        IDomainObjectExpander<TDomainObject> domainObjectExpander,
+        CancellationToken cancellationToken)
     {
         var expectedParents = await domainObjectExpander.GetAllParents([domainObject], cancellationToken);
 

@@ -2,14 +2,14 @@
 
 namespace HierarchicalExpand.DependencyInjection;
 
-public interface IHierarchicalExpandSettings
+public interface IHierarchicalExpandBuilder
 {
-    IHierarchicalExpandSettings AddHierarchicalInfo<TDomainObject>(
+    IHierarchicalExpandBuilder AddHierarchicalInfo<TDomainObject>(
         HierarchicalInfo<TDomainObject> hierarchicalInfo,
         FullAncestorLinkInfo<TDomainObject> fullAncestorLinkInfo,
         DeepLevelInfo<TDomainObject>? deepLevelInfo = null);
 
-    IHierarchicalExpandSettings AddHierarchicalInfo<TDomainObject, TDirectedLink, TUndirectedLink>(
+    IHierarchicalExpandBuilder AddHierarchicalInfo<TDomainObject, TDirectedLink, TUndirectedLink>(
         Expression<Func<TDomainObject, TDomainObject?>> parentPath,
         AncestorLinkInfo<TDomainObject, TDirectedLink> directed,
         AncestorLinkInfo<TDomainObject, TUndirectedLink> undirected,
