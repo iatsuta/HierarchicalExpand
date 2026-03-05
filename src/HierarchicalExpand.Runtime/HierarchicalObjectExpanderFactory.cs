@@ -10,6 +10,7 @@ public class HierarchicalObjectExpanderFactory : IHierarchicalObjectExpanderFact
     private readonly IServiceProxyFactory serviceProxyFactory;
     private readonly IIdentityInfoSource identityInfoSource;
     private readonly IRealTypeResolver realTypeResolver;
+
     private readonly IDictionaryCache<Type, IHierarchicalObjectExpander> cache;
 
     public HierarchicalObjectExpanderFactory(IServiceProvider serviceProvider, IServiceProxyFactory serviceProxyFactory, IIdentityInfoSource identityInfoSource,
@@ -37,14 +38,19 @@ public class HierarchicalObjectExpanderFactory : IHierarchicalObjectExpanderFact
 
             var identityInfo = identityInfoSource.GetIdentityInfo(domainType);
 
-            var (serviceType, args) = fullAncestorLinkInfo != null
-                ? (typeof(HierarchicalObjectAncestorLinkExpander<,,,>)
-                        .MakeGenericType(domainType, fullAncestorLinkInfo.DirectedLinkType, fullAncestorLinkInfo.UndirectedLinkType, identityInfo.IdentityType),
-                    [fullAncestorLinkInfo, identityInfo])
+            if (fullAncestorLinkInfo != null)
+            {
+                var serviceType = typeof(HierarchicalObjectAncestorLinkExpander<,,,>)
+                    .MakeGenericType(domainType, fullAncestorLinkInfo.DirectedLinkType, fullAncestorLinkInfo.UndirectedLinkType, identityInfo.IdentityType);
 
-                : (typeof(PlainHierarchicalObjectExpander<>).MakeGenericType(identityInfo.IdentityType), Array.Empty<object>());
+                return serviceProxyFactory.Create<IHierarchicalObjectExpander>(serviceType, fullAncestorLinkInfo, identityInfo);
+            }
+            else
+            {
+                var serviceType = typeof(PlainHierarchicalObjectExpander<>).MakeGenericType(identityInfo.IdentityType);
 
-            return serviceProxyFactory.Create<IHierarchicalObjectExpander>(serviceType, args);
+                return serviceProxyFactory.Create<IHierarchicalObjectExpander>(serviceType);
+            }
         }
     }
 
