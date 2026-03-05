@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Linq.Expressions;
+﻿using System.Linq.Expressions;
 
 using CommonFramework;
 using CommonFramework.ExpressionEvaluate;
@@ -241,10 +240,5 @@ public class HierarchicalObjectAncestorLinkExpander<TDomainObject, TDirectedAnce
         var filter = idPath.Select(domainObjectId => idents.Contains(domainObjectId));
 
         return queryableSource.GetQueryable<TAncestorLink>().Where(filter).Select(ancestorLinkInfo.To.Path);
-    }
-
-    public IEnumerable Expand(IEnumerable idents, HierarchicalExpandType expandType)
-    {
-        return this.Expand((IEnumerable<TIdent>)idents, expandType);
     }
 }

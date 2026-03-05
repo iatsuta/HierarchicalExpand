@@ -7,7 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace HierarchicalExpand.DependencyInjection;
 
-public class HierarchicalExpandBuilder : IHierarchicalExpandBuilder, IServiceCollectionBuilder
+public class HierarchicalExpandBuilder : IHierarchicalExpandBuilder, IServiceInitializer
 {
     private readonly List<Action<IServiceCollection>> actions = [];
 

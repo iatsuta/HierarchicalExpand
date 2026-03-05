@@ -15,6 +15,9 @@ public interface IHierarchicalObjectExpander<TIdent> : IHierarchicalObjectExpand
     Dictionary<TIdent, TIdent> ExpandWithParents(IEnumerable<TIdent> idents, HierarchicalExpandType expandType);
 
     Dictionary<TIdent, TIdent> ExpandWithParents(IQueryable<TIdent> idents, HierarchicalExpandType expandType);
+
+    IEnumerable IHierarchicalObjectExpander.Expand(IEnumerable idents, HierarchicalExpandType expandType) =>
+        this.Expand((IEnumerable<TIdent>)idents, expandType);
 }
 
 public interface IHierarchicalObjectExpander

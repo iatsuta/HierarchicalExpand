@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Linq.Expressions;
+﻿using System.Linq.Expressions;
 
 namespace HierarchicalExpand;
 
@@ -19,11 +18,6 @@ public class PlainHierarchicalObjectExpander<TIdent> : IHierarchicalObjectExpand
     public Expression<Func<TIdent, IEnumerable<TIdent>>>? TryGetSingleExpandExpression(HierarchicalExpandType _)
     {
         return null;
-    }
-
-    public IEnumerable Expand(IEnumerable idents, HierarchicalExpandType _)
-    {
-        return idents;
     }
 
     public Dictionary<TIdent, TIdent> ExpandWithParents(IEnumerable<TIdent> idents, HierarchicalExpandType expandType)
