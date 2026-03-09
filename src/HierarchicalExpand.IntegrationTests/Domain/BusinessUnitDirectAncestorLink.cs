@@ -2,7 +2,7 @@
 
 public class BusinessUnitDirectAncestorLink
 {
-    public Guid Id { get; set; }
+    public virtual Guid Id { get; set; }
 
     public virtual required BusinessUnit Ancestor { get; init; }
 

@@ -1,14 +1,16 @@
 ﻿using CommonFramework.GenericRepository;
 
 using GenericQueryable;
+
 using HierarchicalExpand.Denormalization;
 using HierarchicalExpand.IntegrationTests.Domain;
+using HierarchicalExpand.IntegrationTests.Environment;
 
 using Microsoft.Extensions.DependencyInjection;
 
 namespace HierarchicalExpand.IntegrationTests;
 
-public class MainTests : TestBase
+public abstract class MainTests(TestEnvironment testEnvironment) : TestBase(testEnvironment)
 {
     [Fact]
     public async Task InvokeExpandWithParents_ForRootBu_DataCorrected()
@@ -31,7 +33,6 @@ public class MainTests : TestBase
         dict.Count.Should().Be(1);
         dict.Should().BeEquivalentTo(new Dictionary<Guid, Guid> { { rootBuId, Guid.Empty } });
     }
-
     [Fact]
     public async Task InvokeChildrenExpand_ForRootBu_DataCorrected()
     {
@@ -55,8 +56,6 @@ public class MainTests : TestBase
         result.OrderBy(v => v).Should().BeEquivalentTo(expectedBuIdents);
     }
 
-
-    [Fact]
     public async Task InvokeAllExpand_ForMiddleBu_DataCorrected()
     {
         // Arrange
@@ -82,7 +81,6 @@ public class MainTests : TestBase
         result.OrderBy(v => v).Should().BeEquivalentTo(expectedBuIdents);
     }
 
-    [Fact]
     public async Task GetSyncAllResult_ReturnsEmpty_WhenNoChangesDetected()
     {
         // Arrange
