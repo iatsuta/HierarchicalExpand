@@ -2,7 +2,7 @@
 
 public class TestHierarchicalObjectDirectAncestorLink
 {
-    public Guid Id { get; set; }
+    public virtual Guid Id { get; set; }
 
     public virtual required TestHierarchicalObject Ancestor { get; init; }
 

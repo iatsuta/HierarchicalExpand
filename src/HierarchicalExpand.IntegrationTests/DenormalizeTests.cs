@@ -1,16 +1,14 @@
 ﻿using CommonFramework;
 using CommonFramework.GenericRepository;
-
 using GenericQueryable;
-
 using HierarchicalExpand.Denormalization;
 using HierarchicalExpand.IntegrationTests.Domain;
-
+using HierarchicalExpand.IntegrationTests.Environment;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace HierarchicalExpand.IntegrationTests;
 
-public class DenormalizeTests : TestBase
+public abstract class DenormalizeTests(TestEnvironment testEnvironment) : TestBase(testEnvironment)
 {
     [Fact]
     public async Task Initialize_Should_DenormalizeAncestors_ForLargeTree()
@@ -65,7 +63,7 @@ public class DenormalizeTests : TestBase
     }
 
     private Task InitTree(CancellationToken cancellationToken) =>
-        this.Evaluate<IGenericRepository>(async genericRepository =>
+        this.ScopeEvaluator.EvaluateAsync<IGenericRepository>(async genericRepository =>
         {
             var tree = CreateTree(new TestHierarchicalObject()).ToList();
 
@@ -76,7 +74,7 @@ public class DenormalizeTests : TestBase
         });
 
     private Task MoveNode(CancellationToken cancellationToken) =>
-        this.Evaluate<IServiceProvider>(async sp =>
+        this.ScopeEvaluator.EvaluateAsync<IServiceProvider>(async sp =>
         {
             var queryableSource = sp.GetRequiredService<IQueryableSource>();
             var genericRepository = sp.GetRequiredService<IGenericRepository>();
@@ -94,16 +92,16 @@ public class DenormalizeTests : TestBase
 
     private async Task Denormalize(CancellationToken cancellationToken)
     {
-        await this.Evaluate<IAncestorDenormalizer<TestHierarchicalObject>>(denormalizer =>
+        await this.ScopeEvaluator.EvaluateAsync<IAncestorDenormalizer<TestHierarchicalObject>>(denormalizer =>
             denormalizer.Initialize(cancellationToken));
 
-        await this.Evaluate<IDeepLevelDenormalizer<TestHierarchicalObject>>(denormalizer =>
+        await this.ScopeEvaluator.EvaluateAsync<IDeepLevelDenormalizer<TestHierarchicalObject>>(denormalizer =>
             denormalizer.Initialize(cancellationToken));
     }
 
     private Task<bool> DeepLevelCorrected(CancellationToken cancellationToken)
     {
-        return this.Evaluate(async (IQueryableSource queryableSource) =>
+        return this.ScopeEvaluator.EvaluateAsync(async (IQueryableSource queryableSource) =>
         {
             return await queryableSource
                 .GetQueryable<TestHierarchicalObject>()
@@ -113,7 +111,7 @@ public class DenormalizeTests : TestBase
     }
 
     private Task<SyncResult<TestHierarchicalObject, TestHierarchicalObjectDirectAncestorLink>> GetSyncState(CancellationToken cancellationToken) =>
-        this.Evaluate((IAncestorLinkExtractor<TestHierarchicalObject, TestHierarchicalObjectDirectAncestorLink> ancestorLinkExtractor) =>
+        this.ScopeEvaluator.EvaluateAsync((IAncestorLinkExtractor<TestHierarchicalObject, TestHierarchicalObjectDirectAncestorLink> ancestorLinkExtractor) =>
             ancestorLinkExtractor.GetSyncAllResult(cancellationToken));
 
     private static IEnumerable<TestHierarchicalObject> CreateTree(TestHierarchicalObject current, int deepSize = 6, int branchCount = 3)

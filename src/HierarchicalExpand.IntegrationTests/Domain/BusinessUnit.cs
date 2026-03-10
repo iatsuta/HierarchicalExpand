@@ -2,11 +2,11 @@
 
 public class BusinessUnit
 {
-    public Guid Id { get; set; }
+    public virtual Guid Id { get; set; }
 
     public virtual BusinessUnit? Parent { get; set; }
 
-    public required string Name { get; set; }
+    public virtual required string Name { get; set; }
 
-    public int DeepLevel { get; set; }
+    public virtual int DeepLevel { get; set; }
 }

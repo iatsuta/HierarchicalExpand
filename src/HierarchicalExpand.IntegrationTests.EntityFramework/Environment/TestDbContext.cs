@@ -2,7 +2,7 @@
 
 using Microsoft.EntityFrameworkCore;
 
-namespace HierarchicalExpand.IntegrationTests;
+namespace HierarchicalExpand.IntegrationTests.Environment;
 
 public class TestDbContext(DbContextOptions<TestDbContext> options) : DbContext(options)
 {
@@ -81,29 +81,5 @@ public class TestDbContext(DbContextOptions<TestDbContext> options) : DbContext(
             entity.HasOne(e => e.Source).WithMany().HasForeignKey($"{nameof(TestHierarchicalObjectUndirectAncestorLink.Source)}{DefaultIdPostfix}").IsRequired();
             entity.HasOne(e => e.Target).WithMany().HasForeignKey($"{nameof(TestHierarchicalObjectUndirectAncestorLink.Target)}{DefaultIdPostfix}").IsRequired();
         }
-    }
-
-    public async Task EnsureViewsCreatedAsync(CancellationToken cancellationToken = default)
-    {
-        await this.Database.ExecuteSqlRawAsync(@$"
-CREATE VIEW {nameof(BusinessUnitUndirectAncestorLink)}
-AS
-SELECT ancestorId as sourceId, childId as targetId
-FROM {nameof(BusinessUnitDirectAncestorLink)}
-UNION
-SELECT childId as sourceId, ancestorId as targetId
-FROM {nameof(BusinessUnitDirectAncestorLink)}
-", cancellationToken);
-
-        await this.Database.ExecuteSqlRawAsync(@$"
-CREATE VIEW {nameof(TestHierarchicalObjectUndirectAncestorLink)}
-AS
-SELECT ancestorId as sourceId, childId as targetId
-FROM {nameof(TestHierarchicalObjectDirectAncestorLink)}
-UNION
-SELECT childId as sourceId, ancestorId as targetId
-FROM {nameof(TestHierarchicalObjectDirectAncestorLink)}
-", cancellationToken);
-
     }
 }
