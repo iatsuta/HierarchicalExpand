@@ -42,7 +42,12 @@ public class HierarchicalExpandBuilder : IHierarchicalExpandBuilder, IServiceIni
             var directLinkType =
                 typeof(FullAncestorLinkInfo<,>).MakeGenericType(fullAncestorLinkInfo.DomainObjectType, fullAncestorLinkInfo.DirectedLinkType);
 
+            var withUndirectLinkType =
+                typeof(FullAncestorLinkInfo<,,>).MakeGenericType(fullAncestorLinkInfo.DomainObjectType, fullAncestorLinkInfo.DirectedLinkType,
+                    fullAncestorLinkInfo.UndirectedLinkType);
+
             services.AddSingleton(directLinkType, fullAncestorLinkInfo);
+            services.AddSingleton(withUndirectLinkType, fullAncestorLinkInfo);
 
             if (deepLevelInfo != null)
             {
@@ -63,7 +68,8 @@ public class HierarchicalExpandBuilder : IHierarchicalExpandBuilder, IServiceIni
             .AddScoped<IAncestorDenormalizer, AncestorDenormalizer>()
             .AddScoped(typeof(IAncestorDenormalizer<>), typeof(AncestorDenormalizer<>))
             .AddScoped(typeof(IAncestorLinkExtractor<,>), typeof(AncestorLinkExtractor<,>))
-            .AddSingleton<IRealTypeResolver, IdentityRealTypeResolver>()
+            .AddSingleton<IActualDomainTypeResolver, IdentityActualTypeResolver>()
+            .AddSingleton<IHierarchicalObjectExpanderTypeResolver, HierarchicalObjectExpanderTypeResolver>()
             .AddScoped<IHierarchicalObjectExpanderFactory, HierarchicalObjectExpanderFactory>()
             .AddScoped(typeof(IDomainObjectExpanderFactory<>), typeof(DomainObjectExpanderFactory<>))
             .AddSingleton<IHierarchicalInfoSource, HierarchicalInfoSource>();

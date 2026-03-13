@@ -27,9 +27,6 @@ public class AncestorDenormalizer<TDomainObject>(IServiceProxyFactory servicePro
         serviceProxyFactory.Create<IAncestorDenormalizer<TDomainObject>>(
             typeof(AncestorDenormalizer<,>).MakeGenericType(typeof(TDomainObject), fullAncestorLinkInfo.DirectedLinkType));
 
-	public Task SyncUpAsync(TDomainObject domainObject, CancellationToken cancellationToken) =>
-		this.innerService.SyncUpAsync(domainObject, cancellationToken);
-
 	public Task Initialize(CancellationToken cancellationToken) =>
 		this.innerService.Initialize(cancellationToken);
 
@@ -44,13 +41,6 @@ public class AncestorDenormalizer<TDomainObject, TDirectAncestorLink>(
     where TDirectAncestorLink : class, new()
     where TDomainObject : class
 {
-    public async Task SyncUpAsync(TDomainObject domainObject, CancellationToken cancellationToken)
-    {
-        var syncResult = await ancestorLinkExtractor.GetSyncResult(domainObject, cancellationToken);
-
-        await this.ApplySync(syncResult, cancellationToken);
-    }
-
     public async Task Initialize(CancellationToken cancellationToken)
     {
         var syncResult = await ancestorLinkExtractor.GetSyncAllResult(cancellationToken);
