@@ -21,8 +21,7 @@ public class DomainObjectExpanderTests
 
 		var expander = new DomainObjectExpander<DomainObject>(
 			new HierarchicalInfo<DomainObject>(x => x.Parent),
-			queryableSource,
-            false);
+			queryableSource);
 
 		// Act
 		var result = expandUp

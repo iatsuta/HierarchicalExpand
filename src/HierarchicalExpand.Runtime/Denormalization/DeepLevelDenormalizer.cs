@@ -12,11 +12,11 @@ public class DeepLevelDenormalizer(IServiceProvider serviceProvider, IEnumerable
     {
         foreach (var deepLevelInfo in deepLevelInfoList)
         {
-            var initializer =
+            var innerInitializer =
                 (IDeepLevelDenormalizer)serviceProvider.GetRequiredService(
                     typeof(IDeepLevelDenormalizer<>).MakeGenericType(deepLevelInfo.DomainObjectType));
 
-            await initializer.Initialize(cancellationToken);
+            await innerInitializer.Initialize(cancellationToken);
         }
     }
 }
