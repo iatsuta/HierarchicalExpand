@@ -66,7 +66,10 @@ public class HierarchicalExpandBuilder : IHierarchicalExpandBuilder, IServiceIni
             .AddScoped<IDeepLevelDenormalizer, DeepLevelDenormalizer>()
             .AddScoped(typeof(IDeepLevelDenormalizer<>), typeof(DeepLevelDenormalizer<>))
             .AddScoped<IAncestorDenormalizer, AncestorDenormalizer>()
+
+            .BindServiceProxy(typeof(IAncestorDenormalizer<>), typeof(AncestorDenormalizerServiceProxyBinder<>))
             .AddScoped(typeof(IAncestorDenormalizer<>), typeof(AncestorDenormalizer<>))
+
             .AddScoped(typeof(IAncestorLinkExtractor<,>), typeof(AncestorLinkExtractor<,>))
             .AddSingleton<IActualDomainTypeResolver, IdentityActualTypeResolver>()
             .AddSingleton<IHierarchicalObjectExpanderTypeResolver, HierarchicalObjectExpanderTypeResolver>()

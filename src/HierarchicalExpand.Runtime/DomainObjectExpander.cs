@@ -4,9 +4,9 @@ using GenericQueryable;
 
 namespace HierarchicalExpand;
 
-public class DomainObjectExpander<TDomainObject>(HierarchicalInfo<TDomainObject> hierarchicalInfo, IQueryableSource queryableSource, bool cached)
-	: IDomainObjectExpander<TDomainObject>
-	where TDomainObject : class
+public class DomainObjectExpander<TDomainObject>(HierarchicalInfo<TDomainObject> hierarchicalInfo, IQueryableSource queryableSource)
+    : IDomainObjectExpander<TDomainObject>
+    where TDomainObject : class
 {
     private Dictionary<TDomainObject, TDomainObject?>? baseCache;
 
@@ -46,9 +46,6 @@ public class DomainObjectExpander<TDomainObject>(HierarchicalInfo<TDomainObject>
     }
 
     private async ValueTask<IReadOnlyDictionary<TDomainObject, TDomainObject?>> GetCache(CancellationToken cancellationToken) =>
-        cached ? this.baseCache ??= await this.CreateCache(cancellationToken) : await this.CreateCache(cancellationToken);
-
-    private async ValueTask<Dictionary<TDomainObject, TDomainObject?>> CreateCache(CancellationToken cancellationToken) =>
-        await queryableSource.GetQueryable<TDomainObject>().WithFetch(r => r.Fetch(hierarchicalInfo.ParentPath))
+        this.baseCache ??= await queryableSource.GetQueryable<TDomainObject>().WithFetch(r => r.Fetch(hierarchicalInfo.ParentPath))
             .GenericToDictionaryAsync(d => d, hierarchicalInfo.ParentFunc, cancellationToken);
 }

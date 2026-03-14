@@ -1,9 +1,12 @@
 ﻿using CommonFramework;
 using CommonFramework.GenericRepository;
+
 using GenericQueryable;
+
 using HierarchicalExpand.Denormalization;
 using HierarchicalExpand.IntegrationTests.Domain;
 using HierarchicalExpand.IntegrationTests.Environment;
+
 using Microsoft.Extensions.DependencyInjection;
 
 namespace HierarchicalExpand.IntegrationTests;

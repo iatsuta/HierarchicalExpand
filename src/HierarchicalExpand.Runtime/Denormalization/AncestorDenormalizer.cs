@@ -12,20 +12,19 @@ public class AncestorDenormalizer(IServiceProvider serviceProvider, IEnumerable<
     {
         foreach (var fullAncestorLinkInfo in fullAncestorLinkInfoList)
         {
-            var initializer =
+            var innerInitializer =
                 (IAncestorDenormalizer)serviceProvider.GetRequiredService(
                     typeof(IAncestorDenormalizer<>).MakeGenericType(fullAncestorLinkInfo.DomainObjectType));
 
-            await initializer.Initialize(cancellationToken);
+            await innerInitializer.Initialize(cancellationToken);
         }
     }
 }
 
-public class AncestorDenormalizer<TDomainObject>(IServiceProxyFactory serviceProxyFactory, FullAncestorLinkInfo<TDomainObject> fullAncestorLinkInfo) : IAncestorDenormalizer<TDomainObject>
+public class AncestorDenormalizer<TDomainObject>(IServiceProxyFactory serviceProxyFactory) : IAncestorDenormalizer<TDomainObject>
 {
     private readonly IAncestorDenormalizer<TDomainObject> innerService =
-        serviceProxyFactory.Create<IAncestorDenormalizer<TDomainObject>>(
-            typeof(AncestorDenormalizer<,>).MakeGenericType(typeof(TDomainObject), fullAncestorLinkInfo.DirectedLinkType));
+        serviceProxyFactory.Create<IAncestorDenormalizer<TDomainObject>>();
 
 	public Task Initialize(CancellationToken cancellationToken) =>
 		this.innerService.Initialize(cancellationToken);

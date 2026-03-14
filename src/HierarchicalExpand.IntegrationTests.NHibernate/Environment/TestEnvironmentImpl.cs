@@ -20,9 +20,15 @@ public class TestEnvironmentImpl : TestEnvironment
             .AddIdentitySource()
             .AddSingleton(BuildConfigurationHelper.BuildConfiguration($"Data Source={this.dbName}"))
             .AddSingletonFrom((global::NHibernate.Cfg.Configuration cfg) => cfg.BuildSessionFactory())
+
             .AddScoped<AutoCommitSession>()
+
+            .AddSingleton(typeof(IDomainObjectSaveStrategy<>), typeof(DomainObjectSaveStrategy<>))
+            .BindServiceProxy(typeof(IDomainObjectSaveStrategy<>), typeof(DomainObjectSaveStrategyServiceProxyBinder<>))
+
             .AddScoped<IGenericRepository, NHibGenericRepository>()
             .AddScoped<IQueryableSource, NHibQueryableSource>()
+
             .AddNHibernateGenericQueryable();
     }
 
