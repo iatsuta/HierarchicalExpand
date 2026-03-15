@@ -51,7 +51,7 @@ public class TestEnvironmentImpl : TestEnvironment
         await using var scope = this.RootServiceProvider.CreateAsyncScope();
         await using var session = scope.ServiceProvider.GetRequiredService<AutoCommitSession>();
 
-        foreach (var createViewCode in GetViews())
+        foreach (var createViewCode in GetViews("app"))
         {
             await session.NativeSession.CreateSQLQuery(createViewCode).ExecuteUpdateAsync(cancellationToken);
         }

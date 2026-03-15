@@ -10,7 +10,9 @@ public class TestHierarchicalObjectUndirectAncestorLinkMap : ClassMap<TestHierar
     {
         this.Schema("app");
 
-        this.Id(x => x.FakeId).GeneratedBy.GuidComb();
+        this.SchemaAction.None();
+
+        this.Id(x => x.Id).GeneratedBy.Assigned();
 
         this.References(x => x.Source).Column("SourceId").Not.Nullable();
         this.References(x => x.Target).Column("TargetId").Not.Nullable();

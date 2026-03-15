@@ -39,26 +39,36 @@ public abstract class TestEnvironment
 
     public abstract Task InitializeDatabase();
 
-    protected IEnumerable<string> GetViews()
+    protected IEnumerable<string> GetViews(string? schema)
     {
-        yield return @$"
-CREATE VIEW {nameof(BusinessUnitUndirectAncestorLink)}
-AS
-    SELECT ancestorId as sourceId, childId as targetId
-FROM {nameof(BusinessUnitDirectAncestorLink)}
-UNION
-    SELECT childId as sourceId, ancestorId as targetId
-FROM {nameof(BusinessUnitDirectAncestorLink)}
-";
+        yield return GetUndirectAncestorLinkTypeView(
+            typeof(BusinessUnitUndirectAncestorLink),
+            typeof(BusinessUnitDirectAncestorLink), schema);
 
-        yield return @$"
-CREATE VIEW {nameof(TestHierarchicalObjectUndirectAncestorLink)}
+        yield return GetUndirectAncestorLinkTypeView(
+            typeof(TestHierarchicalObjectUndirectAncestorLink),
+            typeof(TestHierarchicalObjectDirectAncestorLink),
+            schema);
+    }
+
+    private static string GetUndirectAncestorLinkTypeView(Type undirectAncestorLinkType, Type directAncestorLinkType, string? schema)
+    {
+        var schemaPrefix = schema == null ? "" : $"{schema}_";
+
+        return @$"
+CREATE VIEW {schemaPrefix}{undirectAncestorLinkType.Name}
 AS
-SELECT ancestorId as sourceId, childId as targetId
-FROM {nameof(TestHierarchicalObjectDirectAncestorLink)}
+    SELECT ancestorId as sourceId, childId as targetId, Id AS Id
+    FROM {schemaPrefix}{directAncestorLinkType.Name}
 UNION
-SELECT childId as sourceId, ancestorId as targetId
-FROM {nameof(TestHierarchicalObjectDirectAncestorLink)}
-";
+    SELECT
+         childId as sourceId, ancestorId as targetId, lower(
+        substr(hex(Id), 17, 16) || '-' ||
+        substr(hex(Id), 13, 4) || '-' ||
+        substr(hex(Id), 9, 4) || '-' ||
+        substr(hex(Id), 5, 4) || '-' ||
+        substr(hex(Id), 1, 4) || substr(hex(Id), 21, 12)
+    ) as Id
+    FROM {schemaPrefix}{directAncestorLinkType.Name}";
     }
 }

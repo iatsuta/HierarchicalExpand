@@ -10,7 +10,9 @@ public class BusinessUnitUndirectAncestorLinkMap : ClassMap<BusinessUnitUndirect
     {
         this.Schema("app");
 
-        this.Id(x => x.FakeId).GeneratedBy.GuidComb();
+        this.SchemaAction.None();
+
+        this.Id(x => x.Id).GeneratedBy.Assigned();
 
         this.References(x => x.Source).Column(nameof(BusinessUnitUndirectAncestorLink.Source) + "Id").Not.Nullable();
         this.References(x => x.Target).Column(nameof(BusinessUnitUndirectAncestorLink.Target) + "Id").Not.Nullable();
