@@ -33,6 +33,7 @@ public abstract class MainTests(TestEnvironment testEnvironment) : TestBase(test
         dict.Count.Should().Be(1);
         dict.Should().BeEquivalentTo(new Dictionary<Guid, Guid> { { rootBuId, Guid.Empty } });
     }
+
     [Fact]
     public async Task InvokeChildrenExpand_ForRootBu_DataCorrected()
     {
@@ -56,6 +57,7 @@ public abstract class MainTests(TestEnvironment testEnvironment) : TestBase(test
         result.OrderBy(v => v).Should().BeEquivalentTo(expectedBuIdents);
     }
 
+    [Fact]
     public async Task InvokeAllExpand_ForMiddleBu_DataCorrected()
     {
         // Arrange
@@ -81,6 +83,7 @@ public abstract class MainTests(TestEnvironment testEnvironment) : TestBase(test
         result.OrderBy(v => v).Should().BeEquivalentTo(expectedBuIdents);
     }
 
+    [Fact]
     public async Task GetSyncAllResult_ReturnsEmpty_WhenNoChangesDetected()
     {
         // Arrange
