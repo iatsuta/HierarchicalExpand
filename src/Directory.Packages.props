@@ -4,10 +4,10 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageVersion Include="FluentNHibernate" Version="3.4.1" />
-    <PackageVersion Include="IvAt.CommonFramework" Version="3.0.4" />
-    <PackageVersion Include="IvAt.CommonFramework.GenericRepository" Version="3.0.4" />
-    <PackageVersion Include="IvAt.CommonFramework.IdentitySource" Version="3.0.4" />
-    <PackageVersion Include="IvAt.CommonFramework.IdentitySource.Abstractions" Version="3.0.4" />
+    <PackageVersion Include="IvAt.CommonFramework" Version="3.0.5" />
+    <PackageVersion Include="IvAt.CommonFramework.GenericRepository" Version="3.0.5" />
+    <PackageVersion Include="IvAt.CommonFramework.IdentitySource" Version="3.0.5" />
+    <PackageVersion Include="IvAt.CommonFramework.IdentitySource.Abstractions" Version="3.0.5" />
     <PackageVersion Include="IvAt.GenericQueryable.Abstractions" Version="3.0.4" />
     <PackageVersion Include="IvAt.GenericQueryable.EntityFramework" Version="3.0.4" />
     <PackageVersion Include="IvAt.GenericQueryable.NHibernate" Version="3.0.4" />
